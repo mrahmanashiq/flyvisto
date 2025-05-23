@@ -1,7 +1,6 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
+const fs = require('fs');
+const path = require('path');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
@@ -74,4 +73,4 @@ function cleanupLogs() {
 // Run the cleanup
 cleanupLogs();
 
-export default cleanupLogs;
+module.exports = cleanupLogs;

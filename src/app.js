@@ -1,7 +1,7 @@
-import express from 'express';
-import { PORT, Logger } from './config/index.js';
-import apiRoutes from './routes/index.js';
-import { notFoundHandler, errorHandler } from './middleware/error-handlers.js';
+const express = require('express');
+const { PORT, Logger } = require('./config/index.js');
+const apiRoutes = require('./routes/index.js');
+const { notFoundHandler, errorHandler } = require('./middlewares/index.js');
 
 const app = express();
 

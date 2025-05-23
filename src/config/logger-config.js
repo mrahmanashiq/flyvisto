@@ -1,17 +1,13 @@
-import { createLogger, format, transports } from "winston";
-import dotenv from "dotenv";
-import "winston-daily-rotate-file";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
+const winston = require("winston");
+const dotenv = require("dotenv");
+require("winston-daily-rotate-file");
+const path = require("path");
+const fs = require("fs");
 
-const { combine, timestamp, printf, colorize, metadata } = format;
+// Load environment variables
 dotenv.config();
 
-// Get directory path
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const { combine, timestamp, printf, colorize } = winston.format;
 
 // Load package.json using relative path
 const packageJsonPath = path.resolve(__dirname, "../../package.json");
@@ -36,12 +32,12 @@ const generateCorrelationId = () => {
 };
 
 // Format metadata for professional structured logging
-const metadataFormatter = format((info) => {
+const metadataFormatter = winston.format((info) => {
   // Add standard context to all logs
   info.service = APP_NAME;
   info.version = APP_VERSION;
   info.environment = NODE_ENV;
-  
+
   // Add correlation ID if not present
   if (!info.correlationId) {
     info.correlationId = generateCorrelationId();
@@ -56,7 +52,7 @@ const metadataFormatter = format((info) => {
   if (info.headers && info.headers.authorization) {
     info.headers.authorization = "[REDACTED]";
   }
-  
+
   // Clean sensitive cookies if present
   if (info.headers && info.headers.cookie) {
     info.headers.cookie = "[REDACTED]";
@@ -72,7 +68,6 @@ const metadataFormatter = format((info) => {
 
 // Custom format for structured error logging with your preferred layout
 const customFormat = printf(({ level, message, timestamp, ...meta }) => {
-  // Create professional context object with ordered fields for readability
   const {
     correlationId,
     errorCode,
@@ -101,22 +96,20 @@ const customFormat = printf(({ level, message, timestamp, ...meta }) => {
     ...rest
   };
 
-  // Format as readable log with JSON context
   const formattedContext =
     Object.keys(context).length > 0
       ? `\n${JSON.stringify(context, null, 2)}`
       : "";
 
-  // Add milliseconds to timestamp
-  const timestampWithMs = timestamp.replace(" ", " ").includes(".") 
-    ? timestamp 
+  const timestampWithMs = timestamp && timestamp.includes(".")
+    ? timestamp
     : `${timestamp}.${new Date().getMilliseconds().toString().padStart(3, '0')}`;
 
   return `${timestampWithMs} : ${level}: ${message} - context: ${formattedContext}`;
 });
 
 // Configure file rotation transports
-const fileRotateTransport = new transports.DailyRotateFile({
+const fileRotateTransport = new winston.transports.DailyRotateFile({
   filename: path.join(logsDir, "combined-%DATE%.log"),
   datePattern: "YYYY-MM-DD",
   maxFiles: "10d",
@@ -126,7 +119,7 @@ const fileRotateTransport = new transports.DailyRotateFile({
   auditFile: path.join(logsDir, "log-audit.json"),
 });
 
-const errorFileRotateTransport = new transports.DailyRotateFile({
+const errorFileRotateTransport = new winston.transports.DailyRotateFile({
   filename: path.join(logsDir, "error-%DATE%.log"),
   datePattern: "YYYY-MM-DD",
   maxFiles: "10d",
@@ -138,7 +131,7 @@ const errorFileRotateTransport = new transports.DailyRotateFile({
 });
 
 // Create the logger
-const logger = createLogger({
+const logger = winston.createLogger({
   level: NODE_ENV === "production" ? "info" : "debug",
   format: combine(
     timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
@@ -146,7 +139,7 @@ const logger = createLogger({
     customFormat
   ),
   transports: [
-    new transports.Console({
+    new winston.transports.Console({
       format: combine(
         colorize(),
         timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
@@ -160,20 +153,13 @@ const logger = createLogger({
 });
 
 // Add convenience methods for enhanced logging
+// Attach httpRequest middleware to logger at the top-level scope
 logger.httpRequest = (req, res, next) => {
-  // Start timing the request
   const startTime = process.hrtime();
-  
-  // Generate correlation ID
   const correlationId = req.headers['x-correlation-id'] || generateCorrelationId();
-  
-  // Add correlation ID to request for use in other middleware/handlers
   req.correlationId = correlationId;
-  
-  // Add correlation ID to response headers
   res.setHeader('x-correlation-id', correlationId);
-  
-  // Log the request
+
   logger.info(`${req.method} ${req.originalUrl}`, {
     correlationId,
     method: req.method,
@@ -181,24 +167,18 @@ logger.httpRequest = (req, res, next) => {
     ip: req.ip,
     headers: req.headers
   });
-  
-  // Log when response is finished
+
   res.on('finish', () => {
-    // Calculate duration
     const hrtime = process.hrtime(startTime);
     const durationMs = Math.round(hrtime[0] * 1000 + hrtime[1] / 1000000);
-    
-    // Get status code
     const statusCode = res.statusCode;
-    
-    // Log at appropriate level based on status code
     const logMethod = statusCode >= 500 ? 'error' : (statusCode >= 400 ? 'warn' : 'info');
-    
+
     let errorCode = null;
     if (statusCode === 404) errorCode = 'RESOURCE_NOT_FOUND';
     else if (statusCode >= 500) errorCode = 'SERVER_ERROR';
     else if (statusCode >= 400) errorCode = 'CLIENT_ERROR';
-    
+
     logger[logMethod](`${statusCode} ${req.method} ${req.originalUrl}`, {
       correlationId,
       statusCode,
@@ -209,8 +189,8 @@ logger.httpRequest = (req, res, next) => {
       durationMs
     });
   });
-  
+
   next();
 };
 
-export default logger;
+module.exports = logger;
