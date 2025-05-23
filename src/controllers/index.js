@@ -1,3 +1,5 @@
-const InfoController = require('./info-controller.js');
+const AirplaneController = require("./airplane-controller");
 
-module.exports = { InfoController };
+module.exports = {
+  AirplaneController,
+};
