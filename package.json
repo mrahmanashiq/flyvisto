@@ -1,0 +1,29 @@
+{
+  "name": "Flyvisto",
+  "description": "A web application for managing flight bookings and itineraries.",
+  "author": "mrahmanashiq",
+  "license": "MIT",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "http-status-codes": "^2.3.0",
+    "mysql2": "^3.14.1",
+    "sequelize": "^6.37.7",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "sequelize-cli": "^6.6.3"
+  },
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test:unit:logger": "node tests/unit/config/logger-config.test.js",
+    "cleanup-logs": "node src/utils/cleanup-logs.js"
+  }
+}
