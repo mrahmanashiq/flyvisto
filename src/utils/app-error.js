@@ -1,4 +1,4 @@
-import { StatusCodes } from 'http-status-codes';
+const { StatusCodes } = require('http-status-codes');
 
 class AppError extends Error {
   constructor(message, statusCode = StatusCodes.INTERNAL_SERVER_ERROR, code = 'INTERNAL_ERROR') {
@@ -9,4 +9,4 @@ class AppError extends Error {
   }
 }
 
-export default AppError;
+module.exports = AppError;

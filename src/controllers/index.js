@@ -1,3 +1,3 @@
-import * as InfoController from './info-controller.js';
+const InfoController = require('./info-controller.js');
 
-export { InfoController };
+module.exports = { InfoController };

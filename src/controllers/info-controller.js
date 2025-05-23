@@ -1,7 +1,7 @@
-import { StatusCodes } from 'http-status-codes';
+const { StatusCodes } = require('http-status-codes');
 
 const info = (req, res) => {
-  consol.log('Info controller called');
+  console.log('Info controller called');
   return res.status(StatusCodes.OK).json({
     success: true,
     message: 'All ok',
@@ -10,4 +10,4 @@ const info = (req, res) => {
   });
 };
 
-export { info };
+module.exports = { info };
