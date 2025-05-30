@@ -1,4 +1,4 @@
-import { Logger } from '../../../src/config/index.js';
+const { Logger } = require('../../../src/config/index.js');
 
 console.log('Starting logger test...');
 
@@ -7,7 +7,7 @@ const generateRandomLog = () => {
   const levels = ['info', 'warn', 'error'];
   const level = levels[Math.floor(Math.random() * levels.length)];
   const message = `Test log message ${Math.random().toString(36).substring(2, 15)}`;
-  
+
   const meta = {
     timestamp: new Date().toISOString(),
     requestId: Math.random().toString(36).substring(2, 10),
@@ -16,9 +16,9 @@ const generateRandomLog = () => {
       isTest: true
     }
   };
-  
+
   return { level, message, meta };
-}
+};
 
 // Modify rotation settings temporarily for testing
 // Note: This assumes you're exporting the transports in your logger-config.js
@@ -36,7 +36,7 @@ const interval = setInterval(() => {
     console.log('Test complete!');
     process.exit(0);
   }
-  
+
   // Generate multiple logs per interval
   for (let i = 0; i < 10; i++) {
     const { level, message, meta } = generateRandomLog();

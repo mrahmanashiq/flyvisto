@@ -1,3 +1,1 @@
-const { AppError } = require('./app-error.js');
-
-module.exports = { AppError };
+// will update the file to include all utility functions
