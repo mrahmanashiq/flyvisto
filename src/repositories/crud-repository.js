@@ -6,17 +6,19 @@ class CrudRepository {
     }
 
     async create(data) {
-        try {
-            const response = await this.model.create(data);
-            return response;
-        } catch (error) {
-            Logger.error('something went wrong in the create method of CrudRepository', {
-                stack: error.stack,
-                errorCode: 'CRUD_REPOSITORY_CREATE_ERROR',
-                data
-            });
-            throw error;
-        }
+        // try {
+        //     const response = await this.model.create(data);
+        //     return response;
+        // } catch (error) {
+        //     Logger.error('something went wrong in the create method of CrudRepository', {
+        //         stack: error.stack,
+        //         errorCode: 'CRUD_REPOSITORY_CREATE_ERROR',
+        //         data
+        //     });
+        //     throw error;
+        // }
+        const response = await this.model.create(data);
+        return response;
     }
 
     async get(id) {

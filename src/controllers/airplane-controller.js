@@ -13,10 +13,9 @@ async function createAirplane(req, res) {
             data: airplane
         }));
     } catch (error) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(ErrorResponse.createErrorResponse({
-            message: 'Something went wrong while creating the airplane',
-            errors: error.errors || error
-        }));
+        res.status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json(
+            ErrorResponse.createErrorResponse({ error })
+        );
     }
 }
 

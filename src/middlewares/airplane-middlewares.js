@@ -3,7 +3,11 @@ const { ErrorResponse } = require('../utils/common');
 
 function validateCreateAndUpdateAirplane(req, res, next) {
   const { name, modelNumber, capacity } = req.body;
-  const errors = [];
+  const error = {
+    errors: [],
+    message: 'Validation failed.',
+    code: 'VALIDATION_ERROR'
+  };
 
 //   if (!name) {
 //     errors.push({ field: 'name', message: 'Name is required.' });
@@ -12,23 +16,19 @@ function validateCreateAndUpdateAirplane(req, res, next) {
 //   }
 
   if (!modelNumber) {
-    errors.push({ field: 'modelNumber', message: 'Model is required.', code: 'MODEL_REQUIRED' });
+    error.errors.push({ field: 'modelNumber', message: 'Model number is required.', code: 'MODEL_NUMBER_REQUIRED' });
   } else if (typeof modelNumber !== 'string') {
-    errors.push({ field: 'modelNumber', message: 'Model must be a string.', code: 'INVALID_VALUE' });
+    error.errors.push({ field: 'modelNumber', message: 'Model number must be a string.', code: 'INVALID_VALUE' });
   }
 
   if (capacity === undefined || capacity === null) {
-    errors.push({ field: 'capacity', message: 'Capacity is required.', code: 'CAPACITY_REQUIRED' });
+    error.errors.push({ field: 'capacity', message: 'Capacity is required.', code: 'CAPACITY_REQUIRED' });
   } else if (typeof capacity !== 'number' || capacity <= 0) {
-    errors.push({ field: 'capacity', message: 'Capacity must be a positive number.', code: 'INVALID_VALUE' });
+    error.errors.push({ field: 'capacity', message: 'Capacity must be a positive number.', code: 'INVALID_VALUE' });
   }
 
-  if (errors.length > 0) {
-    return res.status(StatusCodes.BAD_REQUEST).json(ErrorResponse.createErrorResponse({
-      message: 'Validation failed.',
-      code: 'VALIDATION_ERROR',
-      errors
-    }));
+  if (error.errors.length > 0) {
+    return res.status(StatusCodes.BAD_REQUEST).json(ErrorResponse.createErrorResponse({ error }));
   }
 
   next();
