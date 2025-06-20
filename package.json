@@ -25,6 +25,7 @@
     "dev": "nodemon src/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "seed-db": "npx sequelize-cli db:seed:all",
     "test:unit:logger": "node tests/unit/config/logger-config.test.js",
     "cleanup-logs": "node src/utils/cleanup-logs.js"
   }

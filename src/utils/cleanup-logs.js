@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const logsDir = path.join(process.cwd(), 'logs');
+const logsDir = path.join(__dirname, '..', '..', 'logs');
 
 const NODE_ENV = process.env.NODE_ENV;
 const MAX_AGE_DAYS = NODE_ENV === 'production' ? 60 : 1;
