@@ -29,7 +29,10 @@
     "dev": "nodemon src/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "seed-db": "npx sequelize-cli db:seed:all",
+    "db:migrate": "npx sequelize-cli db:migrate",
+    "db:seed": "npx sequelize-cli db:seed:all",
+    "db:create": "npx sequelize-cli db:create",
+    "db:drop": "npx sequelize-cli db:drop",
     "test:unit:logger": "node tests/unit/config/logger-config.test.js",
     "cleanup-logs": "node src/utils/cleanup-logs.js"
   }

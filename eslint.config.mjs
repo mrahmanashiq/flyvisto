@@ -7,7 +7,7 @@ export default [
     ignores: ['node_modules/', 'dist/', 'build/', 'coverage/', 'logs/', '*.min.js', '.env'],
     languageOptions: {
       ecmaVersion: 2021,
-      sourceType: 'module' // since your project is module
+      sourceType: 'commonjs'
     },
     plugins: {
       node: nodePlugin,
@@ -16,7 +16,7 @@ export default [
     rules: {
       'no-console': 'off',
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-      'node/no-unsupported-features/es-syntax': ['off'], // Since your project is module already
+      'node/no-unsupported-features/es-syntax': ['error'],
       'prettier/prettier': [
         'warn',
         {
