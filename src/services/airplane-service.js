@@ -19,6 +19,16 @@ async function createAirplane(data) {
   }
 }
 
+async function getAirplanes() {
+  try {
+    const airplanes = await airplaneRepository.getAll();
+    return airplanes;
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   createAirplane,
+  getAirplanes,
 };
