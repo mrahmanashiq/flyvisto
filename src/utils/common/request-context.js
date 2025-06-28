@@ -12,7 +12,7 @@ function setRequestContext(data) {
 
 const requestContext = {
   getRequestContext,
-  setRequestContext
+  setRequestContext,
 };
 
-module.exports = requestContext
+module.exports = requestContext;

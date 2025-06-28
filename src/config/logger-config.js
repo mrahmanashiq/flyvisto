@@ -1,8 +1,8 @@
-const winston = require("winston");
-const dotenv = require("dotenv");
-require("winston-daily-rotate-file");
-const path = require("path");
-const fs = require("fs");
+const winston = require('winston');
+const dotenv = require('dotenv');
+require('winston-daily-rotate-file');
+const path = require('path');
+const fs = require('fs');
 
 // Load environment variables
 dotenv.config();
@@ -10,16 +10,16 @@ dotenv.config();
 const { combine, timestamp, printf, colorize } = winston.format;
 
 // Load package.json using relative path
-const packageJsonPath = path.resolve(__dirname, "../../package.json");
-const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+const packageJsonPath = path.resolve(__dirname, '../../package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
 // Application metadata
-const APP_NAME = packageJson.name || "ms-api";
-const APP_VERSION = packageJson.version || "1.0.0";
-const NODE_ENV = process.env.NODE_ENV || "development";
+const APP_NAME = packageJson.name || 'ms-api';
+const APP_VERSION = packageJson.version || '1.0.0';
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Create logs directory if it doesn't exist
-const logsDir = path.join(process.cwd(), "logs");
+const logsDir = path.join(process.cwd(), 'logs');
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir);
 }
@@ -50,17 +50,17 @@ const metadataFormatter = winston.format((info) => {
 
   // Clean sensitive data if present
   if (info.headers && info.headers.authorization) {
-    info.headers.authorization = "[REDACTED]";
+    info.headers.authorization = '[REDACTED]';
   }
 
   // Clean sensitive cookies if present
   if (info.headers && info.headers.cookie) {
-    info.headers.cookie = "[REDACTED]";
+    info.headers.cookie = '[REDACTED]';
   }
 
   // Remove very large or circular objects
   if (info.body && Object.keys(info.body).length > 100) {
-    info.body = "[BODY TOO LARGE]";
+    info.body = '[BODY TOO LARGE]';
   }
 
   return info;
@@ -93,58 +93,59 @@ const customFormat = printf(({ level, message, timestamp, ...meta }) => {
     ...(version && { version }),
     ...(environment && { environment }),
     ...(headers && { headers }),
-    ...rest
+    ...rest,
   };
 
   const formattedContext =
     Object.keys(context).length > 0
       ? `\n${JSON.stringify(context, null, 2)}`
-      : "";
+      : '';
 
-  const timestampWithMs = timestamp && timestamp.includes(".")
-    ? timestamp
-    : `${timestamp}.${new Date().getMilliseconds().toString().padStart(3, '0')}`;
+  const timestampWithMs =
+    timestamp && timestamp.includes('.')
+      ? timestamp
+      : `${timestamp}.${new Date().getMilliseconds().toString().padStart(3, '0')}`;
 
   return `${timestampWithMs} : ${level}: ${message} - context: ${formattedContext}`;
 });
 
 // Configure file rotation transports
 const fileRotateTransport = new winston.transports.DailyRotateFile({
-  filename: path.join(logsDir, "combined-%DATE%.log"),
-  datePattern: "YYYY-MM-DD",
-  maxFiles: "10d",
-  maxSize: "20m",
+  filename: path.join(logsDir, 'combined-%DATE%.log'),
+  datePattern: 'YYYY-MM-DD',
+  maxFiles: '10d',
+  maxSize: '20m',
   zippedArchive: true,
-  frequency: NODE_ENV === "production" ? "1d" : "1m",
-  auditFile: path.join(logsDir, "log-audit.json"),
+  frequency: NODE_ENV === 'production' ? '1d' : '1m',
+  auditFile: path.join(logsDir, 'log-audit.json'),
 });
 
 const errorFileRotateTransport = new winston.transports.DailyRotateFile({
-  filename: path.join(logsDir, "error-%DATE%.log"),
-  datePattern: "YYYY-MM-DD",
-  maxFiles: "10d",
-  maxSize: "20m",
-  level: "error",
+  filename: path.join(logsDir, 'error-%DATE%.log'),
+  datePattern: 'YYYY-MM-DD',
+  maxFiles: '10d',
+  maxSize: '20m',
+  level: 'error',
   zippedArchive: true,
-  frequency: NODE_ENV === "production" ? "1d" : "1m",
-  auditFile: path.join(logsDir, "error-log-audit.json"),
+  frequency: NODE_ENV === 'production' ? '1d' : '1m',
+  auditFile: path.join(logsDir, 'error-log-audit.json'),
 });
 
 // Create the logger
 const logger = winston.createLogger({
-  level: NODE_ENV === "production" ? "info" : "debug",
+  level: NODE_ENV === 'production' ? 'info' : 'debug',
   format: combine(
-    timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     metadataFormatter(),
-    customFormat
+    customFormat,
   ),
   transports: [
     new winston.transports.Console({
       format: combine(
         colorize(),
-        timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         metadataFormatter(),
-        customFormat
+        customFormat,
       ),
     }),
     errorFileRotateTransport,
@@ -156,7 +157,8 @@ const logger = winston.createLogger({
 // Attach httpRequest middleware to logger at the top-level scope
 logger.httpRequest = (req, res, next) => {
   const startTime = process.hrtime();
-  const correlationId = req.headers['x-correlation-id'] || generateCorrelationId();
+  const correlationId =
+    req.headers['x-correlation-id'] || generateCorrelationId();
   req.correlationId = correlationId;
   res.setHeader('x-correlation-id', correlationId);
 
@@ -165,14 +167,15 @@ logger.httpRequest = (req, res, next) => {
     method: req.method,
     url: req.originalUrl,
     ip: req.ip,
-    headers: req.headers
+    headers: req.headers,
   });
 
   res.on('finish', () => {
     const hrtime = process.hrtime(startTime);
     const durationMs = Math.round(hrtime[0] * 1000 + hrtime[1] / 1000000);
     const statusCode = res.statusCode;
-    const logMethod = statusCode >= 500 ? 'error' : (statusCode >= 400 ? 'warn' : 'info');
+    const logMethod =
+      statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'info';
 
     let errorCode = null;
     if (statusCode === 404) errorCode = 'RESOURCE_NOT_FOUND';
@@ -186,7 +189,7 @@ logger.httpRequest = (req, res, next) => {
       method: req.method,
       url: req.originalUrl,
       ip: req.ip,
-      durationMs
+      durationMs,
     });
   });
 

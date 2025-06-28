@@ -14,10 +14,10 @@ const notFoundHandler = (req, res, next) => {
   };
 
   Logger.error(`404 Not Found: ${req.originalUrl}`, errorDetails);
-  res.status(StatusCodes.NOT_FOUND).json({ 
+  res.status(StatusCodes.NOT_FOUND).json({
     success: false,
     message: 'Resource not found',
-    code: 'RESOURCE_NOT_FOUND'
+    code: 'RESOURCE_NOT_FOUND',
   });
 };
 
@@ -39,7 +39,7 @@ const errorHandler = (err, req, res, next) => {
 
   // Set appropriate status code
   const statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
-  
+
   // Log with appropriate level based on status code
   if (statusCode >= 500) {
     Logger.error(`Server Error: ${err.message}`, errorDetails);
@@ -52,7 +52,7 @@ const errorHandler = (err, req, res, next) => {
     success: false,
     message: err.message || 'Internal Server Error',
     code: err.code || 'INTERNAL_ERROR',
-    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack })
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
   };
 
   res.status(statusCode).json(response);
@@ -60,5 +60,5 @@ const errorHandler = (err, req, res, next) => {
 
 module.exports = {
   notFoundHandler,
-  errorHandler
+  errorHandler,
 };

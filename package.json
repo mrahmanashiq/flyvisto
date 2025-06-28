@@ -17,7 +17,11 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "eslint": "^9.30.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.5.1",
     "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
     "sequelize-cli": "^6.6.3"
   },
   "scripts": {
@@ -25,6 +29,7 @@
     "dev": "nodemon src/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "seed-db": "npx sequelize-cli db:seed:all",
     "test:unit:logger": "node tests/unit/config/logger-config.test.js",
     "cleanup-logs": "node src/utils/cleanup-logs.js"
   }
