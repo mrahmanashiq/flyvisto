@@ -35,8 +35,32 @@ const getAirplane = ResponseHandler.asyncHandler(async (req, res) => {
   });
 });
 
+const deleteAirplane = ResponseHandler.asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  await AirplaneService.deleteAirplane(id);
+  
+  ResponseHandler.sendSuccessResponse(res, {
+    message: 'Airplane deleted successfully',
+    code: 'AIRPLANE_DELETED',
+  });
+});
+
+const updateAirplane = ResponseHandler.asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const airplaneData = req.body;
+  const airplane = await AirplaneService.updateAirplane(id, airplaneData);
+  
+  ResponseHandler.sendSuccessResponse(res, {
+    message: 'Airplane updated successfully',
+    code: 'AIRPLANE_UPDATED',
+    data: airplane,
+  });
+});
+
 module.exports = {
   createAirplane,
   getAirplanes,
   getAirplane,
+  deleteAirplane,
+  updateAirplane,
 };

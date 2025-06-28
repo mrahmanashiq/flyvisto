@@ -20,4 +20,15 @@ router.get(
   AirplaneController.getAirplane,
 );
 
+router.put(
+  '/:id',
+  [AirplaneMiddlewares.validateCreateAndUpdateAirplane],
+  AirplaneController.updateAirplane,
+);
+
+router.delete(
+  '/:id',
+  AirplaneController.deleteAirplane,
+);
+
 module.exports = router;
