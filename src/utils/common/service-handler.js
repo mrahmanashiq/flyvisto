@@ -1,5 +1,6 @@
 const { ValidationError, NotFoundError } = require('../errors/custom-errors');
 const { Logger } = require('../../config');
+const requestContext = require('./request-context');
 
 /**
  * Higher-order function to wrap service methods with standardized error handling
@@ -10,6 +11,9 @@ const { Logger } = require('../../config');
 const serviceErrorHandler = (serviceMethod, serviceName = null) => {
   return async (...args) => {
     const methodName = serviceName || serviceMethod.name || 'anonymous service';
+    
+    // Set service method name in request context for HTTP logging
+    requestContext.setServiceMethod(methodName);
     
     try {
       const result = await serviceMethod(...args);

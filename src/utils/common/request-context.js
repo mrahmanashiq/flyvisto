@@ -7,12 +7,19 @@ function getRequestContext() {
 }
 
 function setRequestContext(data) {
-  asyncLocalStorage.enterWith(data);
+  const currentContext = getRequestContext();
+  asyncLocalStorage.enterWith({ ...currentContext, ...data });
+}
+
+// Helper to set service method name for logging
+function setServiceMethod(serviceName) {
+  setRequestContext({ serviceName });
 }
 
 const requestContext = {
   getRequestContext,
   setRequestContext,
+  setServiceMethod,
 };
 
 module.exports = requestContext;
