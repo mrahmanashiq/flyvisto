@@ -1,5 +1,6 @@
 const { StatusCodes } = require('http-status-codes');
-const { ErrorResponse, SuccessResponse } = require('./index');
+const { createErrorResponse } = require('./error-response');
+const { createSuccessResponse } = require('./success-response');
 
 /**
  * Sends a success response
@@ -11,7 +12,7 @@ const { ErrorResponse, SuccessResponse } = require('./index');
  * @param {number} [options.statusCode=200] - HTTP status code
  */
 const sendSuccessResponse = (res, { message, code, data, statusCode = StatusCodes.OK }) => {
-  const successResponse = SuccessResponse.createSuccessResponse({
+  const successResponse = createSuccessResponse({
     message,
     code,
     data,
@@ -27,7 +28,7 @@ const sendSuccessResponse = (res, { message, code, data, statusCode = StatusCode
  */
 const sendErrorResponse = (res, error) => {
   const statusCode = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
-  const errorResponse = ErrorResponse.createErrorResponse({ error });
+  const errorResponse = createErrorResponse({ error });
   
   return res.status(statusCode).json(errorResponse);
 };
