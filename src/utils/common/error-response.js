@@ -21,20 +21,17 @@ function createErrorResponse({ error }) {
     data: error.data || {},
   };
 
+  // Only add stack trace for unexpected errors and in development
   if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.DEBUG_LOG === 'true'
+    (process.env.NODE_ENV === 'development' || process.env.DEBUG_LOG === 'true') &&
+    error.code !== 'RESOURCE_NOT_FOUND' &&
+    error.code !== 'VALIDATION_ERROR'
   ) {
     response.stack = error.stack;
   }
 
-  Logger.error('Error Response', {
-    correlationId,
-    message: response.message,
-    code: response.code,
-    errors: response.errors,
-    stack: response.stack,
-  });
+  // Don't log error responses here - let HTTP middleware handle the final logging
+  // This avoids duplicate logs and keeps it clean
 
   return response;
 }

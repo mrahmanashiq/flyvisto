@@ -4,29 +4,28 @@ const { Logger } = require('../../config');
 /**
  * Higher-order function to wrap service methods with standardized error handling
  * @param {Function} serviceMethod - The service method to wrap
+ * @param {string} serviceName - Optional name for better logging (recommended)
  * @returns {Function} - Wrapped service method with error handling
  */
-const serviceErrorHandler = (serviceMethod) => {
+const serviceErrorHandler = (serviceMethod, serviceName = null) => {
   return async (...args) => {
+    const methodName = serviceName || serviceMethod.name || 'anonymous service';
+    
     try {
       const result = await serviceMethod(...args);
       
       // Log successful service operation (debug level)
       Logger.debug('Service operation completed successfully', {
-        serviceName: serviceMethod.name || 'anonymous',
+        serviceName: methodName,
         argsCount: args.length,
       });
       
       return result;
     } catch (error) {
-      // Log the original error for debugging
-      Logger.error(`Service error in ${serviceMethod.name || 'anonymous service'}`, {
-        errorName: error.name,
-        errorMessage: error.message,
-        serviceName: serviceMethod.name || 'anonymous',
-        errorCode: error.code || 'UNKNOWN_ERROR',
-        stack: error.stack,
-      });
+      // Don't log expected business errors - let HTTP middleware handle final logging
+      if (error instanceof NotFoundError || error instanceof ValidationError) {
+        throw error;
+      }
       
       // Handle Sequelize validation errors
       if (error.name === 'SequelizeValidationError') {
@@ -35,7 +34,9 @@ const serviceErrorHandler = (serviceMethod) => {
           field: err.path,
         }));
         
-        Logger.warn('Validation error occurred', {
+        // Only log complex validation scenarios
+        Logger.warn(`Database validation failed in ${methodName}`, {
+          serviceName: methodName,
           errorCode: 'VALIDATION_ERROR',
           validationErrors: explanation,
         });
@@ -50,7 +51,8 @@ const serviceErrorHandler = (serviceMethod) => {
           field: err.path,
         }));
         
-        Logger.warn('Unique constraint violation', {
+        Logger.warn(`Unique constraint violation in ${methodName}`, {
+          serviceName: methodName,
           errorCode: 'UNIQUE_CONSTRAINT_ERROR',
           constraintErrors: explanation,
         });
@@ -58,16 +60,12 @@ const serviceErrorHandler = (serviceMethod) => {
         throw new ValidationError(explanation);
       }
       
-      // Re-throw custom errors as-is (already logged above)
-      if (error instanceof ValidationError || error instanceof NotFoundError) {
-        throw error;
-      }
-      
-      // Handle any other errors
-      Logger.error('Unexpected service error', {
-        errorCode: 'UNEXPECTED_SERVICE_ERROR',
+      // Only log real unexpected errors with stack trace
+      Logger.error(`Unexpected error in ${methodName}`, {
+        serviceName: methodName,
         errorName: error.name,
         errorMessage: error.message,
+        errorCode: 'UNEXPECTED_SERVICE_ERROR',
         stack: error.stack,
       });
       
@@ -86,23 +84,11 @@ const serviceErrorHandler = (serviceMethod) => {
  */
 const ensureResourceExists = (resource, message = 'Resource not found', context = {}) => {
   if (!resource) {
-    // Log the not found scenario with context
-    Logger.warn(`Resource not found: ${message}`, {
-      message,
-      searchContext: context,
-      errorCode: 'RESOURCE_NOT_FOUND',
-    });
-    
+    // Don't log here - let the HTTP middleware handle the final logging
     throw new NotFoundError(message);
   }
   
-  // Log successful resource retrieval (debug level)
-  Logger.debug(`Resource found successfully`, {
-    message: 'Resource retrieved',
-    resourceType: context.resourceType || 'unknown',
-    resourceId: context.resourceId || 'unknown',
-  });
-  
+  // No logging for successful resource retrieval - too verbose
   return resource;
 };
 

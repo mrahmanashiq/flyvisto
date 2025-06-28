@@ -5,11 +5,11 @@ const airplaneRepository = new AirplaneRepository();
 
 const createAirplane = ServiceHandler.serviceErrorHandler(async (data) => {
   return await airplaneRepository.create(data);
-});
+}, 'AirplaneService.createAirplane');
 
 const getAirplanes = ServiceHandler.serviceErrorHandler(async () => {
   return await airplaneRepository.getAll();
-});
+}, 'AirplaneService.getAirplanes');
 
 const getAirplaneById = ServiceHandler.serviceErrorHandler(async (id) => {
   const airplane = await airplaneRepository.get(id);
@@ -18,7 +18,7 @@ const getAirplaneById = ServiceHandler.serviceErrorHandler(async (id) => {
     resourceId: id,
     operation: 'getById',
   });
-});
+}, 'AirplaneService.getAirplaneById');
 
 const deleteAirplane = ServiceHandler.serviceErrorHandler(async (id) => {
   const airplane = await airplaneRepository.get(id);
@@ -28,7 +28,7 @@ const deleteAirplane = ServiceHandler.serviceErrorHandler(async (id) => {
     operation: 'delete',
   });
   return await airplaneRepository.delete(id);
-});
+}, 'AirplaneService.deleteAirplane');
 
 const updateAirplane = ServiceHandler.serviceErrorHandler(async (id, data) => {
   const airplane = await airplaneRepository.get(id);
@@ -39,7 +39,7 @@ const updateAirplane = ServiceHandler.serviceErrorHandler(async (id, data) => {
   });
   await airplaneRepository.update(id, data);
   return await airplaneRepository.get(id);
-});
+}, 'AirplaneService.updateAirplane');
 
 module.exports = {
   createAirplane,

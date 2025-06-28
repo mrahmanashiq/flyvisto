@@ -43,6 +43,7 @@ const asyncHandler = (controller) => {
     try {
       await controller(req, res, next);
     } catch (error) {
+      // Don't log here - let error response handler or HTTP middleware log once
       sendErrorResponse(res, error);
     }
   };
