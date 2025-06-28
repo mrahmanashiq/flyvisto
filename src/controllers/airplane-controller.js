@@ -24,7 +24,19 @@ const getAirplanes = ResponseHandler.asyncHandler(async (req, res) => {
   });
 });
 
+const getAirplane = ResponseHandler.asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const airplane = await AirplaneService.getAirplaneById(id);
+  
+  ResponseHandler.sendSuccessResponse(res, {
+    message: 'Airplane retrieved successfully',
+    code: 'AIRPLANE_RETRIEVED',
+    data: airplane,
+  });
+});
+
 module.exports = {
   createAirplane,
   getAirplanes,
+  getAirplane,
 };

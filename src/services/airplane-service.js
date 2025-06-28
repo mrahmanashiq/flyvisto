@@ -1,34 +1,23 @@
 const { AirplaneRepository } = require('../repositories/airplane-repository');
-const { ValidationError } = require('../utils/errors/custom-errors');
-const { StatusCodes } = require('http-status-codes');
+const { ServiceHandler } = require('../utils/common');
 
 const airplaneRepository = new AirplaneRepository();
 
-async function createAirplane(data) {
-  try {
-    const airplane = await airplaneRepository.create(data);
-    return airplane;
-  } catch (error) {
-    if (error.name === 'SequelizeValidationError') {
-      const explanation = error.errors.map((err) => ({
-        message: err.message,
-      }));
-      throw new ValidationError(explanation);
-    }
-    throw error;
-  }
-}
+const createAirplane = ServiceHandler.serviceErrorHandler(async (data) => {
+  return await airplaneRepository.create(data);
+});
 
-async function getAirplanes() {
-  try {
-    const airplanes = await airplaneRepository.getAll();
-    return airplanes;
-  } catch (error) {
-    throw error;
-  }
-}
+const getAirplanes = ServiceHandler.serviceErrorHandler(async () => {
+  return await airplaneRepository.getAll();
+});
+
+const getAirplaneById = ServiceHandler.serviceErrorHandler(async (id) => {
+  const airplane = await airplaneRepository.get(id);
+  return ServiceHandler.ensureResourceExists(airplane, 'Airplane not found');
+});
 
 module.exports = {
   createAirplane,
   getAirplanes,
+  getAirplaneById,
 };
