@@ -2,13 +2,14 @@ const { Logger } = require('../../config');
 const requestContext = require('../common/request-context');
 
 function createErrorResponse({ error }) {
-  const correlationId = requestContext.getRequestContext().correlationId || null;
+  const correlationId =
+    requestContext.getRequestContext().correlationId || null;
 
   const sanitizedErrors = Array.isArray(error?.explanation || error?.errors)
-    ? (error.explanation || error.errors).map(err => ({
+    ? (error.explanation || error.errors).map((err) => ({
         field: err.path || err.field,
         message: err.message,
-        code: err.code || err.validatorKey?.toUpperCase() || 'UNKNOWN_ERROR'
+        code: err.code || err.validatorKey?.toUpperCase() || 'UNKNOWN_ERROR',
       }))
     : [{ message: error.message || String(error) }];
 
@@ -17,10 +18,13 @@ function createErrorResponse({ error }) {
     message: error.message || 'Unexpected error occurred',
     code: error.code || 'INTERNAL_SERVER_ERROR',
     errors: sanitizedErrors,
-    data: error.data || {}
+    data: error.data || {},
   };
 
-  if (process.env.NODE_ENV === 'development' || process.env.DEBUG_LOG === 'true') {
+  if (
+    process.env.NODE_ENV === 'development' ||
+    process.env.DEBUG_LOG === 'true'
+  ) {
     response.stack = error.stack;
   }
 
@@ -29,12 +33,12 @@ function createErrorResponse({ error }) {
     message: response.message,
     code: response.code,
     errors: response.errors,
-    stack: response.stack
+    stack: response.stack,
   });
 
   return response;
 }
 
 module.exports = {
-  createErrorResponse
+  createErrorResponse,
 };

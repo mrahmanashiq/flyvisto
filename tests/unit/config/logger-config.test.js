@@ -13,8 +13,8 @@ const generateRandomLog = () => {
     requestId: Math.random().toString(36).substring(2, 10),
     testData: {
       value: Math.floor(Math.random() * 1000),
-      isTest: true
-    }
+      isTest: true,
+    },
   };
 
   return { level, message, meta };
@@ -27,7 +27,7 @@ const generateRandomLog = () => {
 // Generate many logs quickly
 console.log('Generating logs...');
 const startTime = Date.now();
-const endTime = startTime + (5 * 60 * 1000); // 5 minutes
+const endTime = startTime + 5 * 60 * 1000; // 5 minutes
 
 // Accelerated testing - generate logs faster than normal
 const interval = setInterval(() => {

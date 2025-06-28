@@ -1,13 +1,18 @@
-function createSuccessResponse({ message = 'Request completed successfully', code = 'SUCCESS', data = {}, error = {} } = {}) {
+function createSuccessResponse({
+  message = 'Request completed successfully',
+  code = 'SUCCESS',
+  data = {},
+  error = {},
+} = {}) {
   return {
     success: true,
     message,
     code,
     data,
-    error
+    error,
   };
 }
 
-module.exports = { 
-    createSuccessResponse
+module.exports = {
+  createSuccessResponse,
 };

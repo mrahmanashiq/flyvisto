@@ -17,7 +17,11 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
+    "eslint": "^9.30.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.5.1",
     "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
     "sequelize-cli": "^6.6.3"
   },
   "scripts": {

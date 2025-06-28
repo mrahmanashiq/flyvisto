@@ -7,7 +7,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       modelNumber: {
         type: Sequelize.STRING,
@@ -15,28 +15,28 @@ module.exports = {
         unique: true,
         validate: {
           notEmpty: true,
-          len: [1, 15]
-        }
+          len: [1, 15],
+        },
       },
       capacity: {
         type: Sequelize.INTEGER,
         allowNull: false,
         validate: {
           isInt: true,
-          min: 1
-        }
+          min: 1,
+        },
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Airplanes');
-  }
+  },
 };

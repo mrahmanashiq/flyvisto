@@ -1,4 +1,4 @@
-const AirplaneController = require("./airplane-controller");
+const AirplaneController = require('./airplane-controller');
 
 module.exports = {
   AirplaneController,

@@ -1,5 +1,10 @@
 class BaseError extends Error {
-  constructor(message, statusCode = 500, code = 'INTERNAL_ERROR', explanation = []) {
+  constructor(
+    message,
+    statusCode = 500,
+    code = 'INTERNAL_ERROR',
+    explanation = [],
+  ) {
     super(message);
     this.statusCode = statusCode;
     this.code = code;
@@ -24,5 +29,5 @@ class NotFoundError extends BaseError {
 module.exports = {
   BaseError,
   ValidationError,
-  NotFoundError
+  NotFoundError,
 };
