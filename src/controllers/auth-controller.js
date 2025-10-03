@@ -7,15 +7,24 @@ class AuthController {
   // Register new user
   async register(req, res) {
     try {
-      const { firstName, lastName, email, password, confirmPassword, phoneNumber } = req.body;
+      const {
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword,
+        phoneNumber,
+      } = req.body;
 
       // Validate password confirmation
       if (password !== confirmPassword) {
-        throw new ValidationError([{
-          field: 'confirmPassword',
-          message: 'Passwords do not match',
-          code: 'PASSWORD_MISMATCH'
-        }]);
+        throw new ValidationError([
+          {
+            field: 'confirmPassword',
+            message: 'Passwords do not match',
+            code: 'PASSWORD_MISMATCH',
+          },
+        ]);
       }
 
       const result = await AuthService.register({
@@ -28,10 +37,11 @@ class AuthController {
 
       res.status(StatusCodes.CREATED).json(
         SuccessResponse.createSuccessResponse({
-          message: 'User registered successfully. Please check your email to verify your account.',
+          message:
+            'User registered successfully. Please check your email to verify your account.',
           code: 'USER_REGISTERED',
           data: result,
-        })
+        }),
       );
     } catch (error) {
       res
@@ -51,7 +61,7 @@ class AuthController {
           message: 'Login successful',
           code: 'LOGIN_SUCCESS',
           data: result,
-        })
+        }),
       );
     } catch (error) {
       res
@@ -71,7 +81,7 @@ class AuthController {
           message: 'Tokens refreshed successfully',
           code: 'TOKENS_REFRESHED',
           data: result,
-        })
+        }),
       );
     } catch (error) {
       res
@@ -90,7 +100,7 @@ class AuthController {
           message: 'Logout successful',
           code: 'LOGOUT_SUCCESS',
           data: result,
-        })
+        }),
       );
     } catch (error) {
       res
@@ -110,7 +120,7 @@ class AuthController {
           message: 'Email verified successfully',
           code: 'EMAIL_VERIFIED',
           data: result,
-        })
+        }),
       );
     } catch (error) {
       res
@@ -130,7 +140,7 @@ class AuthController {
           message: 'Password reset instructions sent',
           code: 'RESET_REQUESTED',
           data: result,
-        })
+        }),
       );
     } catch (error) {
       res
@@ -146,11 +156,13 @@ class AuthController {
 
       // Validate password confirmation
       if (password !== confirmPassword) {
-        throw new ValidationError([{
-          field: 'confirmPassword',
-          message: 'Passwords do not match',
-          code: 'PASSWORD_MISMATCH'
-        }]);
+        throw new ValidationError([
+          {
+            field: 'confirmPassword',
+            message: 'Passwords do not match',
+            code: 'PASSWORD_MISMATCH',
+          },
+        ]);
       }
 
       const result = await AuthService.resetPassword(token, password);
@@ -160,7 +172,7 @@ class AuthController {
           message: 'Password reset successfully',
           code: 'PASSWORD_RESET',
           data: result,
-        })
+        }),
       );
     } catch (error) {
       res
@@ -176,17 +188,19 @@ class AuthController {
 
       // Validate password confirmation
       if (newPassword !== confirmPassword) {
-        throw new ValidationError([{
-          field: 'confirmPassword',
-          message: 'Passwords do not match',
-          code: 'PASSWORD_MISMATCH'
-        }]);
+        throw new ValidationError([
+          {
+            field: 'confirmPassword',
+            message: 'Passwords do not match',
+            code: 'PASSWORD_MISMATCH',
+          },
+        ]);
       }
 
       const result = await AuthService.changePassword(
         req.user.id,
         currentPassword,
-        newPassword
+        newPassword,
       );
 
       res.status(StatusCodes.OK).json(
@@ -194,7 +208,7 @@ class AuthController {
           message: 'Password changed successfully',
           code: 'PASSWORD_CHANGED',
           data: result,
-        })
+        }),
       );
     } catch (error) {
       res
@@ -211,7 +225,7 @@ class AuthController {
           message: 'Profile retrieved successfully',
           code: 'PROFILE_RETRIEVED',
           data: { user: req.user.getPublicProfile() },
-        })
+        }),
       );
     } catch (error) {
       res

@@ -24,16 +24,19 @@ module.exports = (sequelize, DataTypes) => {
 
     getAge() {
       if (!this.dateOfBirth) return null;
-      
+
       const today = new Date();
       const birthDate = new Date(this.dateOfBirth);
       let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
         age--;
       }
-      
+
       return age;
     }
 
@@ -129,7 +132,7 @@ module.exports = (sequelize, DataTypes) => {
             const today = new Date();
             const sixMonthsFromNow = new Date();
             sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6);
-            
+
             if (expiryDate <= sixMonthsFromNow) {
               throw new Error('Passport must be valid for at least 6 months');
             }
@@ -165,7 +168,7 @@ module.exports = (sequelize, DataTypes) => {
           'kosher',
           'diabetic',
           'gluten-free',
-          'low-sodium'
+          'low-sodium',
         ),
         defaultValue: 'none',
       },

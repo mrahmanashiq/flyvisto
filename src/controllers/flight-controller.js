@@ -19,10 +19,16 @@ class FlightController {
         sortOrder: req.query.sortOrder || 'asc',
         maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice) : null,
         minPrice: req.query.minPrice ? parseFloat(req.query.minPrice) : null,
-        preferredAirlines: req.query.airlines ? req.query.airlines.split(',') : null,
+        preferredAirlines: req.query.airlines
+          ? req.query.airlines.split(',')
+          : null,
         maxStops: parseInt(req.query.maxStops) || 0,
-        departureTimeRange: req.query.departureTimeRange ? JSON.parse(req.query.departureTimeRange) : null,
-        arrivalTimeRange: req.query.arrivalTimeRange ? JSON.parse(req.query.arrivalTimeRange) : null,
+        departureTimeRange: req.query.departureTimeRange
+          ? JSON.parse(req.query.departureTimeRange)
+          : null,
+        arrivalTimeRange: req.query.arrivalTimeRange
+          ? JSON.parse(req.query.arrivalTimeRange)
+          : null,
       };
 
       const result = await FlightService.searchFlights(searchParams);
@@ -32,7 +38,7 @@ class FlightController {
           message: 'Flights retrieved successfully',
           code: 'FLIGHTS_RETRIEVED',
           data: result,
-        })
+        }),
       );
     } catch (error) {
       res
@@ -46,7 +52,7 @@ class FlightController {
     try {
       const { id } = req.params;
       const includeSeats = req.query.includeSeats === 'true';
-      
+
       const flight = await FlightService.getFlightById(id, includeSeats);
 
       res.status(StatusCodes.OK).json(
@@ -54,7 +60,7 @@ class FlightController {
           message: 'Flight retrieved successfully',
           code: 'FLIGHT_RETRIEVED',
           data: { flight },
-        })
+        }),
       );
     } catch (error) {
       res
@@ -68,7 +74,7 @@ class FlightController {
     try {
       const { id } = req.params;
       const { seatClass } = req.query;
-      
+
       const seats = await FlightService.getAvailableSeats(id, seatClass);
 
       res.status(StatusCodes.OK).json(
@@ -76,7 +82,7 @@ class FlightController {
           message: 'Available seats retrieved successfully',
           code: 'SEATS_RETRIEVED',
           data: { seats },
-        })
+        }),
       );
     } catch (error) {
       res
@@ -96,7 +102,7 @@ class FlightController {
           message: 'Flight created successfully',
           code: 'FLIGHT_CREATED',
           data: { flight },
-        })
+        }),
       );
     } catch (error) {
       res
@@ -110,7 +116,7 @@ class FlightController {
     try {
       const { id } = req.params;
       const updateData = req.body;
-      
+
       const flight = await FlightService.updateFlight(id, updateData);
 
       res.status(StatusCodes.OK).json(
@@ -118,7 +124,7 @@ class FlightController {
           message: 'Flight updated successfully',
           code: 'FLIGHT_UPDATED',
           data: { flight },
-        })
+        }),
       );
     } catch (error) {
       res
@@ -132,7 +138,7 @@ class FlightController {
     try {
       const { id } = req.params;
       const { status, reason } = req.body;
-      
+
       const flight = await FlightService.updateFlightStatus(id, status, reason);
 
       res.status(StatusCodes.OK).json(
@@ -140,7 +146,7 @@ class FlightController {
           message: 'Flight status updated successfully',
           code: 'FLIGHT_STATUS_UPDATED',
           data: { flight },
-        })
+        }),
       );
     } catch (error) {
       res
@@ -156,7 +162,7 @@ class FlightController {
       const {
         startDate = new Date().toISOString().split('T')[0],
         endDate = null,
-        limit = 10
+        limit = 10,
       } = req.query;
 
       const searchParams = {
@@ -166,7 +172,7 @@ class FlightController {
         returnDate: endDate,
         limit: parseInt(limit),
         sortBy: 'departureTime',
-        sortOrder: 'asc'
+        sortOrder: 'asc',
       };
 
       const result = await FlightService.searchFlights(searchParams);
@@ -176,7 +182,7 @@ class FlightController {
           message: 'Route flights retrieved successfully',
           code: 'ROUTE_FLIGHTS_RETRIEVED',
           data: result,
-        })
+        }),
       );
     } catch (error) {
       res

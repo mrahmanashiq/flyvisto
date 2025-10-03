@@ -4,7 +4,7 @@ const { StatusCodes } = require('http-status-codes');
 /**
  * Handles 404 errors for routes that don't exist
  */
-const notFoundHandler = (req, res, next) => {
+const notFoundHandler = (req, res, _next) => {
   const errorDetails = {
     method: req.method,
     url: req.originalUrl,
@@ -14,7 +14,7 @@ const notFoundHandler = (req, res, next) => {
   };
 
   Logger.warn(`404 Not Found: ${req.originalUrl}`, errorDetails);
-  
+
   res.status(StatusCodes.NOT_FOUND).json({
     success: false,
     message: 'Resource not found',
@@ -28,7 +28,7 @@ const notFoundHandler = (req, res, next) => {
 /**
  * Handles all other uncaught errors
  */
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, _next) => {
   const errorDetails = {
     stack: err.stack,
     method: req.method,

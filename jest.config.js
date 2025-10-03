@@ -6,27 +6,19 @@ module.exports = {
   roots: ['<rootDir>/tests'],
 
   // Test file patterns
-  testMatch: [
-    '**/__tests__/**/*.js',
-    '**/?(*.)+(spec|test).js'
-  ],
+  testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(spec|test).js'],
 
   // Coverage configuration
   collectCoverage: true,
   coverageDirectory: 'coverage',
-  coverageReporters: [
-    'text',
-    'lcov',
-    'html',
-    'json-summary'
-  ],
+  coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
   collectCoverageFrom: [
     'src/**/*.js',
     '!src/server.js',
     '!src/config/*.js',
     '!src/migrations/**',
     '!src/seeders/**',
-    '!**/node_modules/**'
+    '!**/node_modules/**',
   ],
 
   // Coverage thresholds
@@ -35,8 +27,8 @@ module.exports = {
       branches: 70,
       functions: 70,
       lines: 70,
-      statements: 70
-    }
+      statements: 70,
+    },
   },
 
   // Setup files
@@ -56,7 +48,7 @@ module.exports = {
   // Module path mapping
   moduleNameMapping: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@tests/(.*)$': '<rootDir>/tests/$1'
+    '^@tests/(.*)$': '<rootDir>/tests/$1',
   },
 
   // Ignore patterns
@@ -64,7 +56,7 @@ module.exports = {
     '/node_modules/',
     '/coverage/',
     '/dist/',
-    '/docker/'
+    '/docker/',
   ],
 
   // Transform files
@@ -98,8 +90,8 @@ module.exports = {
         uniqueOutputName: 'false',
         suiteNameTemplate: '{filepath}',
         classNameTemplate: '{classname}',
-        titleTemplate: '{title}'
-      }
-    ]
-  ]
+        titleTemplate: '{title}',
+      },
+    ],
+  ],
 };

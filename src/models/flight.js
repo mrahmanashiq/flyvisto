@@ -43,7 +43,7 @@ module.exports = (sequelize, DataTypes) => {
 
     // Instance methods
     getAvailableSeats() {
-      return this.seats ? this.seats.filter(seat => seat.isAvailable) : [];
+      return this.seats ? this.seats.filter((seat) => seat.isAvailable) : [];
     }
 
     getDuration() {
@@ -56,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
     getFormattedDuration() {
       const duration = this.getDuration();
       if (!duration) return null;
-      
+
       const hours = Math.floor(duration / (1000 * 60 * 60));
       const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
       return `${hours}h ${minutes}m`;
@@ -138,7 +138,7 @@ module.exports = (sequelize, DataTypes) => {
           'in-flight',
           'arrived',
           'delayed',
-          'cancelled'
+          'cancelled',
         ),
         defaultValue: 'scheduled',
         allowNull: false,

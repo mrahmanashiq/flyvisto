@@ -1,10 +1,13 @@
 const express = require('express');
 const FlightController = require('../../controllers/flight-controller');
-const { authenticate, authorize } = require('../../middlewares/auth-middleware');
-const { 
-  flightSearchValidation, 
+const {
+  authenticate,
+  authorize,
+} = require('../../middlewares/auth-middleware');
+const {
+  flightSearchValidation,
   uuidParamValidation,
-  paginationValidation 
+  paginationValidation,
 } = require('../../middlewares/validation-middleware');
 
 const router = express.Router();
@@ -62,7 +65,7 @@ const router = express.Router();
  *               type: number
  *             first:
  *               type: number
- * 
+ *
  *     Airport:
  *       type: object
  *       properties:
@@ -78,7 +81,7 @@ const router = express.Router();
  *           type: string
  *         country:
  *           type: string
- * 
+ *
  *     Airline:
  *       type: object
  *       properties:
@@ -282,7 +285,11 @@ router.get('/:id', uuidParamValidation('id'), FlightController.getFlightById);
  *       200:
  *         description: Available seats retrieved successfully
  */
-router.get('/:id/seats', uuidParamValidation('id'), FlightController.getAvailableSeats);
+router.get(
+  '/:id/seats',
+  uuidParamValidation('id'),
+  FlightController.getAvailableSeats,
+);
 
 /**
  * @swagger
@@ -385,7 +392,12 @@ router.get('/route/:from/:to', FlightController.getFlightsByRoute);
  *       201:
  *         description: Flight created successfully
  */
-router.post('/', authenticate, authorize('admin'), FlightController.createFlight);
+router.post(
+  '/',
+  authenticate,
+  authorize('admin'),
+  FlightController.createFlight,
+);
 
 /**
  * @swagger
@@ -406,7 +418,13 @@ router.post('/', authenticate, authorize('admin'), FlightController.createFlight
  *       200:
  *         description: Flight updated successfully
  */
-router.put('/:id', authenticate, authorize('admin'), uuidParamValidation('id'), FlightController.updateFlight);
+router.put(
+  '/:id',
+  authenticate,
+  authorize('admin'),
+  uuidParamValidation('id'),
+  FlightController.updateFlight,
+);
 
 /**
  * @swagger
@@ -442,6 +460,12 @@ router.put('/:id', authenticate, authorize('admin'), uuidParamValidation('id'), 
  *       200:
  *         description: Flight status updated successfully
  */
-router.patch('/:id/status', authenticate, authorize('admin', 'agent'), uuidParamValidation('id'), FlightController.updateFlightStatus);
+router.patch(
+  '/:id/status',
+  authenticate,
+  authorize('admin', 'agent'),
+  uuidParamValidation('id'),
+  FlightController.updateFlightStatus,
+);
 
 module.exports = router;

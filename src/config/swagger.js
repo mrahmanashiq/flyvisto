@@ -60,10 +60,14 @@ const options = {
     },
     servers: [
       {
-        url: NODE_ENV === 'production' 
-          ? 'https://api.flyvisto.com'
-          : `http://${HOST}:${PORT}`,
-        description: NODE_ENV === 'production' ? 'Production server' : 'Development server',
+        url:
+          NODE_ENV === 'production'
+            ? 'https://api.flyvisto.com'
+            : `http://${HOST}:${PORT}`,
+        description:
+          NODE_ENV === 'production'
+            ? 'Production server'
+            : 'Development server',
       },
     ],
     components: {
@@ -318,10 +322,7 @@ const options = {
       },
     ],
   },
-  apis: [
-    './src/routes/v1/*.js',
-    './src/models/*.js',
-  ],
+  apis: ['./src/routes/v1/*.js', './src/models/*.js'],
 };
 
 const specs = swaggerJsdoc(options);

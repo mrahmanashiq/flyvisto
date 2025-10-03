@@ -52,8 +52,10 @@ module.exports = (sequelize, DataTypes) => {
       const now = new Date();
       const departureTime = new Date(this.flight?.departureTime);
       const hoursDifference = (departureTime - now) / (1000 * 60 * 60);
-      
-      return hoursDifference > 24 && ['confirmed', 'pending'].includes(this.status);
+
+      return (
+        hoursDifference > 24 && ['confirmed', 'pending'].includes(this.status)
+      );
     }
 
     generatePNR() {
@@ -106,7 +108,7 @@ module.exports = (sequelize, DataTypes) => {
           'confirmed',
           'cancelled',
           'completed',
-          'no-show'
+          'no-show',
         ),
         defaultValue: 'pending',
         allowNull: false,
@@ -117,7 +119,7 @@ module.exports = (sequelize, DataTypes) => {
           'paid',
           'failed',
           'refunded',
-          'partial-refund'
+          'partial-refund',
         ),
         defaultValue: 'pending',
         allowNull: false,
@@ -184,7 +186,11 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       checkInStatus: {
-        type: DataTypes.ENUM('not-checked-in', 'checked-in', 'boarding-pass-issued'),
+        type: DataTypes.ENUM(
+          'not-checked-in',
+          'checked-in',
+          'boarding-pass-issued',
+        ),
         defaultValue: 'not-checked-in',
         allowNull: false,
       },

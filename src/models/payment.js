@@ -89,12 +89,18 @@ module.exports = (sequelize, DataTypes) => {
           'paypal',
           'bank_transfer',
           'wallet',
-          'cash'
+          'cash',
         ),
         allowNull: false,
       },
       paymentProvider: {
-        type: DataTypes.ENUM('stripe', 'paypal', 'square', 'razorpay', 'manual'),
+        type: DataTypes.ENUM(
+          'stripe',
+          'paypal',
+          'square',
+          'razorpay',
+          'manual',
+        ),
         allowNull: false,
       },
       providerTransactionId: {
@@ -109,7 +115,7 @@ module.exports = (sequelize, DataTypes) => {
           'failed',
           'cancelled',
           'refunded',
-          'partially_refunded'
+          'partially_refunded',
         ),
         defaultValue: 'pending',
         allowNull: false,
@@ -177,7 +183,10 @@ module.exports = (sequelize, DataTypes) => {
       hooks: {
         beforeCreate: (payment) => {
           if (!payment.paymentReference) {
-            payment.paymentReference = 'PAY' + Date.now().toString() + Math.random().toString(36).substr(2, 5).toUpperCase();
+            payment.paymentReference =
+              'PAY' +
+              Date.now().toString() +
+              Math.random().toString(36).substr(2, 5).toUpperCase();
           }
         },
       },

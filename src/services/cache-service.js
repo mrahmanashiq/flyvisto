@@ -29,7 +29,7 @@ class CacheService {
             return undefined;
           }
           return Math.min(options.attempt * 100, 3000);
-        }
+        },
       });
 
       this.client.on('error', (err) => {
@@ -169,9 +169,12 @@ class CacheService {
   static generateSearchKey(searchParams) {
     const sortedParams = Object.keys(searchParams)
       .sort()
-      .map(key => `${key}=${searchParams[key]}`)
+      .map((key) => `${key}=${searchParams[key]}`)
       .join('&');
-    return this.generateKey('search', Buffer.from(sortedParams).toString('base64'));
+    return this.generateKey(
+      'search',
+      Buffer.from(sortedParams).toString('base64'),
+    );
   }
 
   // Cache patterns for common operations

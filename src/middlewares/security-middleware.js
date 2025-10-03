@@ -1,9 +1,9 @@
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
-const { 
-  RATE_LIMIT_WINDOW_MS, 
+const {
+  RATE_LIMIT_WINDOW_MS,
   RATE_LIMIT_MAX_REQUESTS,
-  isDevelopment 
+  isDevelopment,
 } = require('../config/server-config');
 
 // CORS configuration
@@ -11,7 +11,7 @@ const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
+
     const allowedOrigins = [
       'http://localhost:3000',
       'http://localhost:3001',
@@ -118,7 +118,7 @@ const sanitizeInput = (req, res, next) => {
   // Remove potentially dangerous characters from string inputs
   const sanitizeString = (str) => {
     if (typeof str !== 'string') return str;
-    
+
     // Remove potential XSS and SQL injection patterns
     return str
       .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
@@ -130,9 +130,9 @@ const sanitizeInput = (req, res, next) => {
 
   const sanitizeObject = (obj) => {
     if (!obj || typeof obj !== 'object') return obj;
-    
+
     const sanitized = Array.isArray(obj) ? [] : {};
-    
+
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
         if (typeof obj[key] === 'string') {
@@ -144,7 +144,7 @@ const sanitizeInput = (req, res, next) => {
         }
       }
     }
-    
+
     return sanitized;
   };
 
@@ -169,13 +169,16 @@ const securityHeaders = (req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-  
+  res.setHeader(
+    'Permissions-Policy',
+    'geolocation=(), microphone=(), camera=()',
+  );
+
   // Content Security Policy
   if (!isDevelopment) {
     res.setHeader(
       'Content-Security-Policy',
-      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self';"
+      "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self';",
     );
   }
 

@@ -21,24 +21,27 @@ class ServerLogsService {
     try {
       const files = await fs.readdir(this.logDirectory);
       const logFiles = files
-        .filter(file => file.endsWith('.log'))
-        .map(file => ({
+        .filter((file) => file.endsWith('.log'))
+        .map((file) => ({
           name: file,
           path: path.join(this.logDirectory, file),
-          size: 0 // Will be populated when reading
+          size: 0, // Will be populated when reading
         }));
-      
+
       // Get file sizes
       for (const file of logFiles) {
         try {
           const stats = await fs.stat(file.path);
           file.size = stats.size;
           file.lastModified = stats.mtime;
-        } catch (error) {
-          Logger.warn('Could not get stats for log file', { file: file.name, error: error.message });
+        } catch (_error) {
+          Logger.warn('Could not get stats for log file', {
+            file: file.name,
+            error: _error.message,
+          });
         }
       }
-      
+
       return logFiles;
     } catch (error) {
       Logger.error('Error reading log directory', { error: error.message });
@@ -56,34 +59,35 @@ class ServerLogsService {
       dateFrom = null,
       dateTo = null,
       search = null,
-      reverse = false
+      reverse = false,
     } = options;
 
     try {
       const filePath = path.join(this.logDirectory, filename);
-      
+
       // Check if file exists
       try {
         await fs.access(filePath);
-      } catch (error) {
+      } catch {
         throw new Error(`Log file ${filename} not found`);
       }
 
       // Read file content
       const content = await fs.readFile(filePath, 'utf8');
-      let logLines = content.split('\n').filter(line => line.trim() !== '');
+      let logLines = content.split('\n').filter((line) => line.trim() !== '');
 
       // Apply filters
       if (level) {
-        logLines = logLines.filter(line => 
-          line.toLowerCase().includes(`"level":"${level.toLowerCase()}"`) ||
-          line.toLowerCase().includes(`level: ${level.toLowerCase()}`)
+        logLines = logLines.filter(
+          (line) =>
+            line.toLowerCase().includes(`"level":"${level.toLowerCase()}"`) ||
+            line.toLowerCase().includes(`level: ${level.toLowerCase()}`),
         );
       }
 
       if (dateFrom) {
         const fromDate = new Date(dateFrom);
-        logLines = logLines.filter(line => {
+        logLines = logLines.filter((line) => {
           const timestamp = this.extractTimestamp(line);
           return timestamp && timestamp >= fromDate;
         });
@@ -91,7 +95,7 @@ class ServerLogsService {
 
       if (dateTo) {
         const toDate = new Date(dateTo);
-        logLines = logLines.filter(line => {
+        logLines = logLines.filter((line) => {
           const timestamp = this.extractTimestamp(line);
           return timestamp && timestamp <= toDate;
         });
@@ -99,8 +103,8 @@ class ServerLogsService {
 
       if (search) {
         const searchLower = search.toLowerCase();
-        logLines = logLines.filter(line => 
-          line.toLowerCase().includes(searchLower)
+        logLines = logLines.filter((line) =>
+          line.toLowerCase().includes(searchLower),
         );
       }
 
@@ -122,12 +126,14 @@ class ServerLogsService {
           dateFrom,
           dateTo,
           search,
-          reverse
-        }
+          reverse,
+        },
       };
-
     } catch (error) {
-      Logger.error('Error reading log file', { filename, error: error.message });
+      Logger.error('Error reading log file', {
+        filename,
+        error: error.message,
+      });
       throw error;
     }
   }
@@ -144,7 +150,9 @@ class ServerLogsService {
       }
 
       // Try to parse standard log format
-      const timestampMatch = line.match(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)/);
+      const timestampMatch = line.match(
+        /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)/,
+      );
       if (timestampMatch) {
         return new Date(timestampMatch[1]);
       }
@@ -156,7 +164,7 @@ class ServerLogsService {
       }
 
       return null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -168,15 +176,15 @@ class ServerLogsService {
     try {
       const filePath = path.join(this.logDirectory, filename);
       const content = await fs.readFile(filePath, 'utf8');
-      const lines = content.split('\n').filter(line => line.trim() !== '');
+      const lines = content.split('\n').filter((line) => line.trim() !== '');
 
       const stats = {
         totalLines: lines.length,
         levels: {},
         dateRange: {
           earliest: null,
-          latest: null
-        }
+          latest: null,
+        },
       };
 
       // Analyze log levels and date range
@@ -191,7 +199,10 @@ class ServerLogsService {
         // Track date range
         const timestamp = this.extractTimestamp(line);
         if (timestamp) {
-          if (!stats.dateRange.earliest || timestamp < stats.dateRange.earliest) {
+          if (
+            !stats.dateRange.earliest ||
+            timestamp < stats.dateRange.earliest
+          ) {
             stats.dateRange.earliest = timestamp;
           }
           if (!stats.dateRange.latest || timestamp > stats.dateRange.latest) {
@@ -202,7 +213,10 @@ class ServerLogsService {
 
       return stats;
     } catch (error) {
-      Logger.error('Error getting log stats', { filename, error: error.message });
+      Logger.error('Error getting log stats', {
+        filename,
+        error: error.message,
+      });
       throw error;
     }
   }
@@ -211,8 +225,8 @@ class ServerLogsService {
    * Search across all log files
    */
   async searchAllLogs(searchTerm, options = {}) {
-    const { lines = 50, level = null } = options;
-    
+    const { lines = 50 } = options;
+
     try {
       const logFiles = await this.getLogFiles();
       const results = [];
@@ -222,25 +236,28 @@ class ServerLogsService {
           const fileResults = await this.readLogFile(file.name, {
             ...options,
             search: searchTerm,
-            lines: Math.min(lines, 100) // Limit per file
+            lines: Math.min(lines, 100), // Limit per file
           });
 
           if (fileResults.lines.length > 0) {
             results.push({
               filename: file.name,
               matches: fileResults.lines.length,
-              lines: fileResults.lines
+              lines: fileResults.lines,
             });
           }
         } catch (error) {
-          Logger.warn('Error searching in log file', { file: file.name, error: error.message });
+          Logger.warn('Error searching in log file', {
+            file: file.name,
+            error: error.message,
+          });
         }
       }
 
       return {
         searchTerm,
         totalMatches: results.reduce((sum, result) => sum + result.matches, 0),
-        files: results
+        files: results,
       };
     } catch (error) {
       Logger.error('Error searching logs', { error: error.message });

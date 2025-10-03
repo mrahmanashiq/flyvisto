@@ -1,11 +1,11 @@
 const nodemailer = require('nodemailer');
-const { 
-  SMTP_HOST, 
-  SMTP_PORT, 
-  SMTP_USER, 
-  SMTP_PASSWORD, 
+const {
+  SMTP_HOST,
+  SMTP_PORT,
+  SMTP_USER,
+  SMTP_PASSWORD,
   FROM_EMAIL,
-  isDevelopment 
+  isDevelopment,
 } = require('../config/server-config');
 const { Logger } = require('../config');
 
@@ -23,8 +23,8 @@ class EmailService {
         secure: false,
         auth: {
           user: 'ethereal.user@ethereal.email',
-          pass: 'ethereal.pass'
-        }
+          pass: 'ethereal.pass',
+        },
       });
     }
 
@@ -50,7 +50,7 @@ class EmailService {
       };
 
       const info = await this.transporter.sendMail(mailOptions);
-      
+
       Logger.info('Email sent successfully', {
         to,
         subject,
@@ -74,7 +74,7 @@ class EmailService {
 
   async sendVerificationEmail(email, token) {
     const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
-    
+
     const subject = 'Verify Your Email - Flyvisto';
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -101,7 +101,7 @@ class EmailService {
 
   async sendPasswordResetEmail(email, token) {
     const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
-    
+
     const subject = 'Reset Your Password - Flyvisto';
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -166,7 +166,7 @@ class EmailService {
 
   async sendFlightStatusUpdate(email, flightData, statusType) {
     let subject, message, color;
-    
+
     switch (statusType) {
       case 'delay':
         subject = `Flight Delayed - ${flightData.flightNumber}`;

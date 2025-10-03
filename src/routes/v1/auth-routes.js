@@ -33,7 +33,7 @@ const router = express.Router();
  *           enum: [customer, admin, agent]
  *         isEmailVerified:
  *           type: boolean
- *     
+ *
  *     AuthTokens:
  *       type: object
  *       properties:
@@ -41,7 +41,7 @@ const router = express.Router();
  *           type: string
  *         refreshToken:
  *           type: string
- *     
+ *
  *     LoginResponse:
  *       type: object
  *       properties:
@@ -222,7 +222,11 @@ router.get('/verify-email', AuthController.verifyEmail);
  *       200:
  *         description: Password reset instructions sent
  */
-router.post('/request-password-reset', requestPasswordResetValidation, AuthController.requestPasswordReset);
+router.post(
+  '/request-password-reset',
+  requestPasswordResetValidation,
+  AuthController.requestPasswordReset,
+);
 
 /**
  * @swagger
@@ -252,7 +256,11 @@ router.post('/request-password-reset', requestPasswordResetValidation, AuthContr
  *       200:
  *         description: Password reset successfully
  */
-router.post('/reset-password', resetPasswordValidation, AuthController.resetPassword);
+router.post(
+  '/reset-password',
+  resetPasswordValidation,
+  AuthController.resetPassword,
+);
 
 /**
  * @swagger
@@ -284,7 +292,12 @@ router.post('/reset-password', resetPasswordValidation, AuthController.resetPass
  *       200:
  *         description: Password changed successfully
  */
-router.post('/change-password', authenticate, changePasswordValidation, AuthController.changePassword);
+router.post(
+  '/change-password',
+  authenticate,
+  changePasswordValidation,
+  AuthController.changePassword,
+);
 
 /**
  * @swagger

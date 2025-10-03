@@ -2,17 +2,17 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { User } = require('../models');
-const { 
-  JWT_SECRET, 
-  JWT_EXPIRES_IN, 
-  JWT_REFRESH_SECRET, 
+const {
+  JWT_SECRET,
+  JWT_EXPIRES_IN,
+  JWT_REFRESH_SECRET,
   JWT_REFRESH_EXPIRES_IN,
-  BCRYPT_SALT_ROUNDS 
+  BCRYPT_SALT_ROUNDS,
 } = require('../config/server-config');
-const { 
-  AuthenticationError, 
-  ValidationError, 
-  NotFoundError 
+const {
+  AuthenticationError,
+  ValidationError,
+  NotFoundError,
 } = require('../utils/errors/custom-errors');
 const EmailService = require('./email-service');
 
@@ -47,11 +47,13 @@ class AuthService {
     // Check if user already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      throw new ValidationError([{
-        field: 'email',
-        message: 'User with this email already exists',
-        code: 'EMAIL_EXISTS'
-      }]);
+      throw new ValidationError([
+        {
+          field: 'email',
+          message: 'User with this email already exists',
+          code: 'EMAIL_EXISTS',
+        },
+      ]);
     }
 
     // Generate email verification token
@@ -68,7 +70,10 @@ class AuthService {
     });
 
     // Send verification email
-    await EmailService.sendVerificationEmail(user.email, emailVerificationToken);
+    await EmailService.sendVerificationEmail(
+      user.email,
+      emailVerificationToken,
+    );
 
     // Generate tokens
     const tokenPayload = {
@@ -124,13 +129,13 @@ class AuthService {
   // Refresh tokens
   async refreshTokens(refreshToken) {
     const decoded = this.verifyToken(refreshToken, true);
-    
+
     const user = await User.findOne({
-      where: { 
-        id: decoded.userId, 
+      where: {
+        id: decoded.userId,
         refreshToken,
-        isActive: true 
-      }
+        isActive: true,
+      },
     });
 
     if (!user) {
@@ -170,15 +175,17 @@ class AuthService {
   // Verify email
   async verifyEmail(token) {
     const user = await User.findOne({
-      where: { emailVerificationToken: token }
+      where: { emailVerificationToken: token },
     });
 
     if (!user) {
-      throw new ValidationError([{
-        field: 'token',
-        message: 'Invalid verification token',
-        code: 'INVALID_TOKEN'
-      }]);
+      throw new ValidationError([
+        {
+          field: 'token',
+          message: 'Invalid verification token',
+          code: 'INVALID_TOKEN',
+        },
+      ]);
     }
 
     await user.update({
@@ -221,15 +228,17 @@ class AuthService {
           [require('sequelize').Op.gt]: new Date(),
         },
         isActive: true,
-      }
+      },
     });
 
     if (!user) {
-      throw new ValidationError([{
-        field: 'token',
-        message: 'Invalid or expired reset token',
-        code: 'INVALID_TOKEN'
-      }]);
+      throw new ValidationError([
+        {
+          field: 'token',
+          message: 'Invalid or expired reset token',
+          code: 'INVALID_TOKEN',
+        },
+      ]);
     }
 
     await user.update({
@@ -266,9 +275,9 @@ class AuthService {
   // Get user by token
   async getUserByToken(token) {
     const decoded = this.verifyToken(token);
-    
+
     const user = await User.findOne({
-      where: { id: decoded.userId, isActive: true }
+      where: { id: decoded.userId, isActive: true },
     });
 
     if (!user) {

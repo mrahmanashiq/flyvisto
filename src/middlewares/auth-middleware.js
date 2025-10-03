@@ -1,20 +1,23 @@
 const { StatusCodes } = require('http-status-codes');
 const AuthService = require('../services/auth-service');
 const { ErrorResponse } = require('../utils/common');
-const { AuthenticationError, AuthorizationError } = require('../utils/errors/custom-errors');
+const {
+  AuthenticationError,
+  AuthorizationError,
+} = require('../utils/errors/custom-errors');
 
 // Middleware to authenticate JWT token
 async function authenticate(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new AuthenticationError('Access token is required');
     }
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     const user = await AuthService.getUserByToken(token);
-    
+
     // Attach user to request object
     req.user = user;
     next();
@@ -50,13 +53,13 @@ function authorize(...roles) {
 async function optionalAuth(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
-    
+
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       const user = await AuthService.getUserByToken(token);
       req.user = user;
     }
-    
+
     next();
   } catch (error) {
     // Continue without authentication

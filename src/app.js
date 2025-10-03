@@ -3,7 +3,14 @@ const helmet = require('helmet');
 const compression = require('compression');
 const cors = require('cors');
 const { ServerLogsService } = require('./services');
-const { notFoundHandler, errorHandler, apiVersioning, getVersionInfo, httpRequestLogger, getRequestMetrics } = require('./middlewares');
+const {
+  notFoundHandler,
+  errorHandler,
+  apiVersioning,
+  getVersionInfo,
+  httpRequestLogger,
+  getRequestMetrics,
+} = require('./middlewares');
 const attachCorrelationId = require('./middlewares/correlation-id');
 const {
   corsOptions,
@@ -53,9 +60,9 @@ app.get('/health', async (req, res) => {
       memory: {
         used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
         total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
-        unit: 'MB'
-      }
-    }
+        unit: 'MB',
+      },
+    },
   };
 
   try {
@@ -78,7 +85,7 @@ app.get('/health', async (req, res) => {
       port: process.env.REDIS_PORT || 6379,
       password: process.env.REDIS_PASSWORD || undefined,
     });
-    
+
     await client.connect();
     await client.ping();
     await client.disconnect();
@@ -104,23 +111,24 @@ app.get('/metrics', (req, res) => {
       total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
       external: Math.round(process.memoryUsage().external / 1024 / 1024),
       rss: Math.round(process.memoryUsage().rss / 1024 / 1024),
-      unit: 'MB'
+      unit: 'MB',
     },
     cpu: {
       usage: process.cpuUsage(),
-      loadAverage: process.platform !== 'win32' ? require('os').loadavg() : [0, 0, 0]
+      loadAverage:
+        process.platform !== 'win32' ? require('os').loadavg() : [0, 0, 0],
     },
     process: {
       pid: process.pid,
       platform: process.platform,
       nodeVersion: process.version,
-      environment: process.env.NODE_ENV
+      environment: process.env.NODE_ENV,
     },
     requests: {
       total: global.requestCount || 0,
       errors: global.errorCount || 0,
-      averageResponseTime: global.averageResponseTime || 0
-    }
+      averageResponseTime: global.averageResponseTime || 0,
+    },
   };
 
   res.status(200).json(metrics);
@@ -136,7 +144,7 @@ app.get('/server-logs', async (req, res) => {
       dateFrom,
       dateTo,
       search,
-      reverse = 'false'
+      reverse = 'false',
     } = req.query;
 
     const options = {
@@ -145,22 +153,22 @@ app.get('/server-logs', async (req, res) => {
       dateFrom,
       dateTo,
       search,
-      reverse: reverse === 'true'
+      reverse: reverse === 'true',
     };
 
     const result = await ServerLogsService.readLogFile(file, options);
-    
+
     res.status(200).json({
       success: true,
       data: result,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,
       code: 'LOG_READ_ERROR',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 });
@@ -169,21 +177,21 @@ app.get('/server-logs', async (req, res) => {
 app.get('/server-logs/files', async (req, res) => {
   try {
     const files = await ServerLogsService.getLogFiles();
-    
+
     res.status(200).json({
       success: true,
       data: {
         files,
-        count: files.length
+        count: files.length,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,
       code: 'LOG_FILES_ERROR',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 });
@@ -192,32 +200,32 @@ app.get('/server-logs/files', async (req, res) => {
 app.get('/server-logs/search', async (req, res) => {
   try {
     const { q: searchTerm, lines = 50, level } = req.query;
-    
+
     if (!searchTerm) {
       return res.status(400).json({
         success: false,
         message: 'Search term is required',
         code: 'MISSING_SEARCH_TERM',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
     const result = await ServerLogsService.searchAllLogs(searchTerm, {
       lines: parseInt(lines),
-      level
+      level,
     });
-    
+
     res.status(200).json({
       success: true,
       data: result,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message,
       code: 'LOG_SEARCH_ERROR',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 });
@@ -227,7 +235,7 @@ app.get('/api/metrics/requests', (req, res) => {
   res.status(200).json({
     success: true,
     data: getRequestMetrics(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 

@@ -66,7 +66,7 @@ module.exports = (sequelize, DataTypes) => {
           'boarding_reminder',
           'promotional',
           'system_maintenance',
-          'account_update'
+          'account_update',
         ),
         allowNull: false,
       },

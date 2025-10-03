@@ -54,7 +54,7 @@ const validateVersion = (version) => {
     valid: isValid,
     version: isValid ? version : DEFAULT_VERSION,
     deprecated: isDeprecated,
-    requested: version
+    requested: version,
   };
 };
 
@@ -77,13 +77,15 @@ const apiVersioning = (req, res, next) => {
     deprecated: validation.deprecated,
     path: req.path,
     method: req.method,
-    correlationId: req.correlationId
+    correlationId: req.correlationId,
   });
 
   // Add deprecation warning header if using deprecated version
   if (validation.deprecated) {
-    res.set('X-API-Deprecation-Warning', 
-      `Version ${validation.requested} is deprecated. Please upgrade to ${DEFAULT_VERSION}`);
+    res.set(
+      'X-API-Deprecation-Warning',
+      `Version ${validation.requested} is deprecated. Please upgrade to ${DEFAULT_VERSION}`,
+    );
   }
 
   // Add version info to response headers
@@ -97,7 +99,7 @@ const apiVersioning = (req, res, next) => {
       code: 'UNSUPPORTED_API_VERSION',
       supportedVersions: SUPPORTED_VERSIONS,
       defaultVersion: DEFAULT_VERSION,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -132,7 +134,7 @@ const requireMinVersion = (minVersion) => {
         code: 'VERSION_TOO_LOW',
         currentVersion,
         requiredVersion: minVersion,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -152,9 +154,9 @@ const getVersionInfo = (req, res) => {
       supportedVersions: SUPPORTED_VERSIONS,
       defaultVersion: DEFAULT_VERSION,
       deprecatedVersions: DEPRECATED_VERSIONS,
-      isDeprecated: req.isDeprecatedVersion
+      isDeprecated: req.isDeprecatedVersion,
     },
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 };
 
@@ -165,5 +167,5 @@ module.exports = {
   getVersionInfo,
   SUPPORTED_VERSIONS,
   DEFAULT_VERSION,
-  DEPRECATED_VERSIONS
+  DEPRECATED_VERSIONS,
 };

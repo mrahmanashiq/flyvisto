@@ -1,6 +1,9 @@
 const { Op } = require('sequelize');
 const { Flight, Airport, Airline, Airplane, Seat } = require('../models');
-const { NotFoundError, ValidationError } = require('../utils/errors/custom-errors');
+const {
+  NotFoundError,
+  ValidationError,
+} = require('../utils/errors/custom-errors');
 const moment = require('moment');
 
 class FlightService {
@@ -46,7 +49,7 @@ class FlightService {
       whereConditions.basePrice = { [Op.lte]: maxPrice };
     }
     if (minPrice) {
-      whereConditions.basePrice = { 
+      whereConditions.basePrice = {
         ...whereConditions.basePrice,
         [Op.gte]: minPrice,
       };
@@ -56,7 +59,9 @@ class FlightService {
     if (departureTimeRange) {
       const { start, end } = departureTimeRange;
       whereConditions[Op.and] = [
-        { departureTime: { [Op.gte]: moment().hour(start).minute(0).toDate() } },
+        {
+          departureTime: { [Op.gte]: moment().hour(start).minute(0).toDate() },
+        },
         { departureTime: { [Op.lte]: moment().hour(end).minute(59).toDate() } },
       ];
     }
@@ -76,7 +81,9 @@ class FlightService {
       {
         model: Airline,
         as: 'airline',
-        where: preferredAirlines ? { code: { [Op.in]: preferredAirlines } } : {},
+        where: preferredAirlines
+          ? { code: { [Op.in]: preferredAirlines } }
+          : {},
       },
       {
         model: Airplane,
@@ -119,22 +126,30 @@ class FlightService {
     });
 
     // Calculate additional data for each flight
-    const enrichedFlights = flights.map(flight => {
+    const enrichedFlights = flights.map((flight) => {
       const flightData = flight.toJSON();
-      
+
       // Calculate duration
-      const duration = moment(flight.arrivalTime).diff(moment(flight.departureTime), 'minutes');
+      const duration = moment(flight.arrivalTime).diff(
+        moment(flight.departureTime),
+        'minutes',
+      );
       flightData.duration = duration;
       flightData.formattedDuration = this.formatDuration(duration);
-      
+
       // Calculate pricing for different classes
-      flightData.pricing = this.calculateClassPricing(flight.basePrice, flightClass);
-      
+      flightData.pricing = this.calculateClassPricing(
+        flight.basePrice,
+        flightClass,
+      );
+
       // Add availability info
       flightData.availability = {
         total: flight.totalSeats,
         available: flight.availableSeats,
-        percentage: Math.round((flight.availableSeats / flight.totalSeats) * 100),
+        percentage: Math.round(
+          (flight.availableSeats / flight.totalSeats) * 100,
+        ),
       };
 
       return flightData;
@@ -195,12 +210,15 @@ class FlightService {
     }
 
     const flightData = flight.toJSON();
-    
+
     // Calculate duration
-    const duration = moment(flight.arrivalTime).diff(moment(flight.departureTime), 'minutes');
+    const duration = moment(flight.arrivalTime).diff(
+      moment(flight.departureTime),
+      'minutes',
+    );
     flightData.duration = duration;
     flightData.formattedDuration = this.formatDuration(duration);
-    
+
     // Calculate pricing for different classes
     flightData.pricing = {
       economy: flight.basePrice,
@@ -231,7 +249,10 @@ class FlightService {
 
     const seats = await Seat.findAll({
       where: whereCondition,
-      order: [['row', 'asc'], ['column', 'asc']],
+      order: [
+        ['row', 'asc'],
+        ['column', 'asc'],
+      ],
     });
 
     return this.groupSeatsByClass(seats);
@@ -254,30 +275,36 @@ class FlightService {
 
     // Validate that airports are different
     if (departureAirportId === arrivalAirportId) {
-      throw new ValidationError([{
-        field: 'arrivalAirportId',
-        message: 'Arrival airport must be different from departure airport',
-        code: 'SAME_AIRPORTS'
-      }]);
+      throw new ValidationError([
+        {
+          field: 'arrivalAirportId',
+          message: 'Arrival airport must be different from departure airport',
+          code: 'SAME_AIRPORTS',
+        },
+      ]);
     }
 
     // Validate that arrival time is after departure time
     if (new Date(arrivalTime) <= new Date(departureTime)) {
-      throw new ValidationError([{
-        field: 'arrivalTime',
-        message: 'Arrival time must be after departure time',
-        code: 'INVALID_TIME_SEQUENCE'
-      }]);
+      throw new ValidationError([
+        {
+          field: 'arrivalTime',
+          message: 'Arrival time must be after departure time',
+          code: 'INVALID_TIME_SEQUENCE',
+        },
+      ]);
     }
 
     // Get airplane capacity
     const airplane = await Airplane.findByPk(airplaneId);
     if (!airplane) {
-      throw new ValidationError([{
-        field: 'airplaneId',
-        message: 'Airplane not found',
-        code: 'AIRPLANE_NOT_FOUND'
-      }]);
+      throw new ValidationError([
+        {
+          field: 'airplaneId',
+          message: 'Airplane not found',
+          code: 'AIRPLANE_NOT_FOUND',
+        },
+      ]);
     }
 
     const flight = await Flight.create({
@@ -304,7 +331,7 @@ class FlightService {
   // Update flight
   async updateFlight(flightId, updateData) {
     const flight = await Flight.findByPk(flightId);
-    
+
     if (!flight) {
       throw new NotFoundError('Flight not found');
     }
@@ -316,16 +343,20 @@ class FlightService {
       if (bookingCount > 0) {
         // Only allow minor time adjustments (up to 2 hours)
         const timeDiff = Math.abs(
-          new Date(updateData.departureTime || flight.departureTime) - 
-          new Date(flight.departureTime)
+          new Date(updateData.departureTime || flight.departureTime) -
+            new Date(flight.departureTime),
         );
-        
-        if (timeDiff > 2 * 60 * 60 * 1000) { // 2 hours in milliseconds
-          throw new ValidationError([{
-            field: 'departureTime',
-            message: 'Cannot change departure time by more than 2 hours when bookings exist',
-            code: 'TIME_CHANGE_RESTRICTED'
-          }]);
+
+        if (timeDiff > 2 * 60 * 60 * 1000) {
+          // 2 hours in milliseconds
+          throw new ValidationError([
+            {
+              field: 'departureTime',
+              message:
+                'Cannot change departure time by more than 2 hours when bookings exist',
+              code: 'TIME_CHANGE_RESTRICTED',
+            },
+          ]);
         }
       }
     }
@@ -337,13 +368,13 @@ class FlightService {
   // Update flight status
   async updateFlightStatus(flightId, status, reason = null) {
     const flight = await Flight.findByPk(flightId);
-    
+
     if (!flight) {
       throw new NotFoundError('Flight not found');
     }
 
     const updateData = { status };
-    
+
     if (status === 'delayed' && reason) {
       updateData.delayReason = reason;
     }
@@ -380,8 +411,9 @@ class FlightService {
     };
 
     const pricing = {};
-    Object.keys(multipliers).forEach(seatClass => {
-      pricing[seatClass] = Math.round(basePrice * multipliers[seatClass] * 100) / 100;
+    Object.keys(multipliers).forEach((seatClass) => {
+      pricing[seatClass] =
+        Math.round(basePrice * multipliers[seatClass] * 100) / 100;
     });
 
     return pricing;
@@ -395,8 +427,11 @@ class FlightService {
       first: [],
     };
 
-    seats.forEach(seat => {
-      const seatClass = seat.seatClass === 'premium-economy' ? 'premiumEconomy' : seat.seatClass;
+    seats.forEach((seat) => {
+      const seatClass =
+        seat.seatClass === 'premium-economy'
+          ? 'premiumEconomy'
+          : seat.seatClass;
       if (seatMap[seatClass]) {
         seatMap[seatClass].push(seat);
       }
@@ -419,20 +454,24 @@ class FlightService {
     // Generate seats by class
     for (const [seatClass, count] of Object.entries(seatConfiguration)) {
       if (count > 0) {
-        const seatsPerRow = seatClass === 'first' ? 4 : seatClass === 'business' ? 4 : 6;
+        const seatsPerRow =
+          seatClass === 'first' ? 4 : seatClass === 'business' ? 4 : 6;
         const rows = Math.ceil(count / seatsPerRow);
-        
+
         for (let row = 0; row < rows; row++) {
           const columns = ['A', 'B', 'C', 'D', 'E', 'F'].slice(0, seatsPerRow);
-          
+
           columns.forEach((column, colIndex) => {
             if (seats.length < count) {
               const seatNumber = `${currentRow}${column}`;
               let seatType = 'middle';
-              
+
               if (colIndex === 0 || colIndex === seatsPerRow - 1) {
                 seatType = 'window';
-              } else if (colIndex === Math.floor(seatsPerRow / 2) - 1 || colIndex === Math.floor(seatsPerRow / 2)) {
+              } else if (
+                colIndex === Math.floor(seatsPerRow / 2) - 1 ||
+                colIndex === Math.floor(seatsPerRow / 2)
+              ) {
                 seatType = 'aisle';
               }
 
@@ -441,13 +480,16 @@ class FlightService {
                 seatNumber,
                 row: currentRow,
                 column,
-                seatClass: seatClass === 'premiumEconomy' ? 'premium-economy' : seatClass,
+                seatClass:
+                  seatClass === 'premiumEconomy'
+                    ? 'premium-economy'
+                    : seatClass,
                 seatType,
                 basePrice: this.calculateSeatPrice(seatClass, seatType),
               });
             }
           });
-          
+
           currentRow++;
         }
       }
@@ -470,7 +512,10 @@ class FlightService {
       middle: 1,
     };
 
-    const basePrice = basePrices[seatClass === 'premium-economy' ? 'premiumEconomy' : seatClass] || 0;
+    const basePrice =
+      basePrices[
+        seatClass === 'premium-economy' ? 'premiumEconomy' : seatClass
+      ] || 0;
     return Math.round(basePrice * typeMultipliers[seatType] * 100) / 100;
   }
 }

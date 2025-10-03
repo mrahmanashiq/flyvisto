@@ -57,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       seatPrice: {
         type: DataTypes.DECIMAL(8, 2),
-        defaultValue: 0.00,
+        defaultValue: 0.0,
         validate: {
           min: 0,
         },
