@@ -4,7 +4,7 @@ const compression = require('compression');
 const cors = require('cors');
 const { Logger } = require('./config');
 const apiRoutes = require('./routes');
-const { notFoundHandler, errorHandler, apiVersioning, getVersionInfo } = require('./middlewares');
+const { notFoundHandler, errorHandler, apiVersioning, getVersionInfo, httpRequestLogger, getRequestMetrics } = require('./middlewares');
 const attachCorrelationId = require('./middlewares/correlation-id');
 const {
   corsOptions,
@@ -34,7 +34,7 @@ app.use(apiVersioning);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(sanitizeInput);
-app.use(Logger.httpRequest);
+app.use(httpRequestLogger);
 
 // API Documentation
 app.use('/api-docs', swagger.serve, swagger.setup);
@@ -125,6 +125,15 @@ app.get('/metrics', (req, res) => {
   };
 
   res.status(200).json(metrics);
+});
+
+// Request metrics endpoint
+app.get('/api/metrics/requests', (req, res) => {
+  res.status(200).json({
+    success: true,
+    data: getRequestMetrics(),
+    timestamp: new Date().toISOString()
+  });
 });
 
 // API version info endpoint
