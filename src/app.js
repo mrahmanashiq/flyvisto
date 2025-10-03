@@ -39,14 +39,59 @@ app.use(Logger.httpRequest);
 app.use('/api-docs', swagger.serve, swagger.setup);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-  res.status(200).json({
+app.get('/health', async (req, res) => {
+  const healthCheck = {
     success: true,
     message: 'Service is healthy',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV,
-  });
+    version: process.env.npm_package_version || '1.0.0',
+    checks: {
+      database: 'unknown',
+      redis: 'unknown',
+      memory: {
+        used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+        total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+        unit: 'MB'
+      }
+    }
+  };
+
+  try {
+    // Check database connectivity
+    const { sequelize } = require('./db/connect');
+    await sequelize.authenticate();
+    healthCheck.checks.database = 'healthy';
+  } catch (error) {
+    healthCheck.checks.database = 'unhealthy';
+    healthCheck.success = false;
+    healthCheck.message = 'Service has issues';
+    Logger.error('Database health check failed', { error: error.message });
+  }
+
+  try {
+    // Check Redis connectivity
+    const redis = require('redis');
+    const client = redis.createClient({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: process.env.REDIS_PORT || 6379,
+      password: process.env.REDIS_PASSWORD || undefined,
+    });
+    
+    await client.connect();
+    await client.ping();
+    await client.disconnect();
+    healthCheck.checks.redis = 'healthy';
+  } catch (error) {
+    healthCheck.checks.redis = 'unhealthy';
+    healthCheck.success = false;
+    healthCheck.message = 'Service has issues';
+    Logger.error('Redis health check failed', { error: error.message });
+  }
+
+  const statusCode = healthCheck.success ? 200 : 503;
+  res.status(statusCode).json(healthCheck);
 });
 
 // API routes
