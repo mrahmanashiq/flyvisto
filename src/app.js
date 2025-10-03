@@ -4,7 +4,7 @@ const compression = require('compression');
 const cors = require('cors');
 const { Logger } = require('./config');
 const apiRoutes = require('./routes');
-const { notFoundHandler, errorHandler } = require('./middlewares');
+const { notFoundHandler, errorHandler, apiVersioning, getVersionInfo } = require('./middlewares');
 const attachCorrelationId = require('./middlewares/correlation-id');
 const {
   corsOptions,
@@ -30,6 +30,7 @@ app.use(compression());
 
 // Request processing middleware
 app.use(attachCorrelationId);
+app.use(apiVersioning);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(sanitizeInput);
@@ -125,6 +126,9 @@ app.get('/metrics', (req, res) => {
 
   res.status(200).json(metrics);
 });
+
+// API version info endpoint
+app.get('/api/version', getVersionInfo);
 
 // API routes
 app.use('/api', apiRoutes);
