@@ -94,6 +94,38 @@ app.get('/health', async (req, res) => {
   res.status(statusCode).json(healthCheck);
 });
 
+// Metrics endpoint
+app.get('/metrics', (req, res) => {
+  const metrics = {
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: {
+      used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+      total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
+      external: Math.round(process.memoryUsage().external / 1024 / 1024),
+      rss: Math.round(process.memoryUsage().rss / 1024 / 1024),
+      unit: 'MB'
+    },
+    cpu: {
+      usage: process.cpuUsage(),
+      loadAverage: process.platform !== 'win32' ? require('os').loadavg() : [0, 0, 0]
+    },
+    process: {
+      pid: process.pid,
+      platform: process.platform,
+      nodeVersion: process.version,
+      environment: process.env.NODE_ENV
+    },
+    requests: {
+      total: global.requestCount || 0,
+      errors: global.errorCount || 0,
+      averageResponseTime: global.averageResponseTime || 0
+    }
+  };
+
+  res.status(200).json(metrics);
+});
+
 // API routes
 app.use('/api', apiRoutes);
 
