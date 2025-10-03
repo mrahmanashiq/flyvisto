@@ -2,8 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const compression = require('compression');
 const cors = require('cors');
-const { Logger } = require('./config');
-const apiRoutes = require('./routes');
+const { ServerLogsService } = require('./services');
 const { notFoundHandler, errorHandler, apiVersioning, getVersionInfo, httpRequestLogger, getRequestMetrics } = require('./middlewares');
 const attachCorrelationId = require('./middlewares/correlation-id');
 const {
@@ -125,6 +124,102 @@ app.get('/metrics', (req, res) => {
   };
 
   res.status(200).json(metrics);
+});
+
+// Server logs endpoint for QA testing
+app.get('/server-logs', async (req, res) => {
+  try {
+    const {
+      file = 'app.log',
+      lines = 100,
+      level,
+      dateFrom,
+      dateTo,
+      search,
+      reverse = 'false'
+    } = req.query;
+
+    const options = {
+      lines: parseInt(lines),
+      level,
+      dateFrom,
+      dateTo,
+      search,
+      reverse: reverse === 'true'
+    };
+
+    const result = await ServerLogsService.readLogFile(file, options);
+    
+    res.status(200).json({
+      success: true,
+      data: result,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      code: 'LOG_READ_ERROR',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Server logs files list endpoint
+app.get('/server-logs/files', async (req, res) => {
+  try {
+    const files = await ServerLogsService.getLogFiles();
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        files,
+        count: files.length
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      code: 'LOG_FILES_ERROR',
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Server logs search endpoint
+app.get('/server-logs/search', async (req, res) => {
+  try {
+    const { q: searchTerm, lines = 50, level } = req.query;
+    
+    if (!searchTerm) {
+      return res.status(400).json({
+        success: false,
+        message: 'Search term is required',
+        code: 'MISSING_SEARCH_TERM',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    const result = await ServerLogsService.searchAllLogs(searchTerm, {
+      lines: parseInt(lines),
+      level
+    });
+    
+    res.status(200).json({
+      success: true,
+      data: result,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      code: 'LOG_SEARCH_ERROR',
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Request metrics endpoint
