@@ -1,6 +1,61 @@
+# Dependencies
 node_modules/
-.idea/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
 .env
+.env.local
+.env.test
+.env.production
+
+# Logs
 logs/
 *.log
+*.log.*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Build output
+dist/
+build/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Database config (if using local config files)
 src/config/config.json
+
+# Uploads directory (runtime files)
+uploads/
+
+# Docker volumes
+docker/volumes/
+
+# Test databases
+*.sqlite
+*.db

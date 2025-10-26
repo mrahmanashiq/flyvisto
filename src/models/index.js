@@ -6,20 +6,37 @@ const Sequelize = require('sequelize');
 const process = require('process');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
+const serverConfig = require('../config/server-config');
+
+// Database configuration from environment variables
+const config = {
+  username: serverConfig.DB_USERNAME,
+  password: serverConfig.DB_PASSWORD,
+  database: serverConfig.DB_NAME,
+  host: serverConfig.DB_HOST,
+  port: serverConfig.DB_PORT,
+  dialect: serverConfig.DB_DIALECT,
+  logging: serverConfig.isDevelopment ? console.log : false,
+  pool: {
+    max: 10,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+  define: {
+    timestamps: true,
+    underscored: false,
+    freezeTableName: true,
+  },
+};
 const db = {};
 
-let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
-} else {
-  sequelize = new Sequelize(
-    config.database,
-    config.username,
-    config.password,
-    config,
-  );
-}
+const sequelize = new Sequelize(
+  config.database,
+  config.username,
+  config.password,
+  config,
+);
 
 fs.readdirSync(__dirname)
   .filter((file) => {
