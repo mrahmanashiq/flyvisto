@@ -15,6 +15,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(Logger.httpRequest);
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
 app.use('/api', apiRoutes);
 
 app.use(notFoundHandler);
