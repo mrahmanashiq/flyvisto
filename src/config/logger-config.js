@@ -182,7 +182,12 @@ logger.httpRequest = (req, res, next) => {
     else if (statusCode >= 500) errorCode = 'SERVER_ERROR';
     else if (statusCode >= 400) errorCode = 'CLIENT_ERROR';
 
-    logger[logMethod](`${statusCode} ${req.method} ${req.originalUrl}`, {
+    // Get service method name from request context
+    const requestContext = require('../utils/common/request-context');
+    const context = requestContext.getRequestContext();
+    const serviceName = context.serviceName;
+
+    const logData = {
       correlationId,
       statusCode,
       errorCode,
@@ -190,7 +195,10 @@ logger.httpRequest = (req, res, next) => {
       url: req.originalUrl,
       ip: req.ip,
       durationMs,
-    });
+      ...(serviceName && { serviceName }),
+    };
+
+    logger[logMethod](`${statusCode} ${req.method} ${req.originalUrl}`, logData);
   });
 
   next();

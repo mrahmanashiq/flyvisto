@@ -2,6 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const compression = require('compression');
 const cors = require('cors');
+const { Logger } = require('./config');
 const { ServerLogsService } = require('./services');
 const {
   notFoundHandler,
